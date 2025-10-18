@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#9c7ead">
     <title>Stella AI Dashboard</title>
     
     <link rel="icon" href="https://placehold.co/32x32/9c7ead/FFFFFF?text=S" type="image/png">
@@ -598,6 +602,454 @@
         ::-webkit-scrollbar-track { background: var(--card-dark); }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+        /* ------------------------- */
+        /* --- Mobile Responsive --- */
+        /* ------------------------- */
+        
+        /* Mobile-first responsive design */
+        @media (max-width: 768px) {
+            /* Mobile sidebar improvements */
+            #mobile-sidebar {
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+            }
+            
+            #mobile-sidebar aside {
+                width: 280px;
+                box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+            }
+            
+            /* Mobile header improvements */
+            header.md\\:hidden {
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                background: rgba(10, 10, 10, 0.95);
+                border-bottom: 1px solid var(--border-dark);
+            }
+            
+            /* Mobile content padding */
+            main {
+                padding-top: 80px !important;
+            }
+            
+            #pages-container {
+                padding: 1rem !important;
+                max-width: 100% !important;
+            }
+            
+            /* Mobile page titles */
+            #page-title {
+                font-size: 1.5rem;
+                margin-bottom: 1rem;
+                text-align: center;
+            }
+            
+            /* Mobile header improvements */
+            header.hidden.md\\:flex {
+                padding: 1rem 1.5rem;
+            }
+            
+            /* Mobile dashboard stats */
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            /* Mobile brand kit grid */
+            .brand-kits-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            /* Mobile asset grid */
+            .assets-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+            
+            /* Mobile activity feed */
+            .activity-feed {
+                max-height: 300px;
+                overflow-y: auto;
+            }
+            
+            /* Mobile search and filters */
+            .search-filters {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .search-filters input,
+            .search-filters select {
+                width: 100%;
+            }
+            
+            /* Mobile cards and components */
+            .glass-card {
+                margin-bottom: 1rem;
+                border-radius: 12px;
+            }
+            
+            /* Mobile buttons - larger touch targets */
+            .glow-btn {
+                min-height: 44px;
+                padding: 12px 16px;
+                font-size: 16px;
+            }
+            
+            /* Mobile navigation items */
+            .nav-item {
+                min-height: 48px;
+                padding: 12px 16px;
+                font-size: 16px;
+            }
+            
+            /* Mobile tables - horizontal scroll */
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                border-radius: 12px;
+            }
+            
+            .table-container table {
+                min-width: 600px;
+            }
+            
+            /* Mobile modals */
+            .modal-content {
+                margin: 1rem;
+                max-height: calc(100vh - 2rem);
+                overflow-y: auto;
+                border-radius: 16px;
+            }
+            
+            .modal-header {
+                padding: 1.5rem 1.5rem 1rem 1.5rem;
+                border-bottom: 1px solid var(--border-dark);
+            }
+            
+            .modal-body {
+                padding: 1.5rem;
+            }
+            
+            .modal-footer {
+                padding: 1rem 1.5rem 1.5rem 1.5rem;
+                border-top: 1px solid var(--border-dark);
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .modal-footer .glow-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            /* Mobile forms */
+            input, select, textarea {
+                font-size: 16px; /* Prevents zoom on iOS */
+                padding: 12px 16px;
+                border-radius: 8px;
+                min-height: 44px; /* Touch-friendly height */
+            }
+            
+            /* Mobile form labels */
+            label {
+                font-size: 14px;
+                font-weight: 500;
+                margin-bottom: 8px;
+                display: block;
+            }
+            
+            /* Mobile form spacing */
+            .space-y-4 > * + * {
+                margin-top: 1rem;
+            }
+            
+            /* Mobile file inputs */
+            .file-input-wrapper {
+                min-height: 44px;
+            }
+            
+            .file-input-label {
+                padding: 12px 16px;
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            /* Mobile select styling */
+            select {
+                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+                background-position: right 12px center;
+                background-repeat: no-repeat;
+                background-size: 16px;
+                padding-right: 40px;
+                appearance: none;
+            }
+            
+            /* Mobile textarea */
+            textarea {
+                resize: vertical;
+                min-height: 100px;
+            }
+            
+            /* Mobile checkbox and switch */
+            input[type="checkbox"] {
+                min-height: 20px;
+                min-width: 20px;
+            }
+            
+            .switch {
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+            }
+            
+            /* Mobile grid improvements */
+            .grid {
+                gap: 1rem;
+            }
+            
+            .grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-3 {
+                grid-template-columns: 1fr;
+            }
+            
+            .grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4 {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Mobile brand kit cards */
+            .brand-kit-card {
+                min-height: 200px;
+            }
+            
+            .brand-kit-card .card-menu-btn {
+                opacity: 1; /* Always visible on mobile */
+                background-color: rgba(0,0,0,0.6);
+            }
+            
+            /* Mobile asset cards */
+            .asset-card {
+                min-height: 120px;
+            }
+            
+            .asset-card-actions .card-menu-btn {
+                opacity: 1; /* Always visible on mobile */
+            }
+            
+            /* Mobile stats cards */
+            .stat-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 1.5rem;
+            }
+            
+            /* Mobile text sizing */
+            h1 { font-size: 1.5rem; }
+            h2 { font-size: 1.25rem; }
+            h3 { font-size: 1.125rem; }
+            
+            /* Mobile spacing */
+            .space-y-6 > * + * {
+                margin-top: 1.5rem;
+            }
+            
+            .space-y-4 > * + * {
+                margin-top: 1rem;
+            }
+            
+            /* Mobile toast positioning */
+            .toast {
+                left: 1rem;
+                right: 1rem;
+                width: auto;
+                max-width: none;
+            }
+            
+            /* Mobile confirmation modal */
+            .confirmation-modal .modal-content {
+                margin: 2rem 1rem;
+                max-width: none;
+            }
+            
+            /* Mobile team member cards */
+            .team-member-card {
+                padding: 1rem;
+                border-radius: 12px;
+            }
+            
+            /* Mobile API key cards */
+            .api-key-card {
+                padding: 1rem;
+                border-radius: 12px;
+            }
+            
+            /* Mobile governance rules */
+            .governance-rule {
+                padding: 1rem;
+                border-radius: 12px;
+            }
+        }
+        
+        /* Tablet responsive design */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            #pages-container {
+                padding: 1.5rem;
+            }
+            
+            .grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-3 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .modal-content {
+                margin: 2rem;
+                max-width: 500px;
+            }
+        }
+        
+        /* Touch-friendly interactions */
+        @media (hover: none) and (pointer: coarse) {
+            /* Remove hover effects on touch devices */
+            .glass-card:hover:not(.no-hover) {
+                transform: none;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+                border-color: var(--border-dark);
+            }
+            
+            .glow-btn:hover::before {
+                width: 0;
+                height: 0;
+                opacity: 0;
+            }
+            
+            .brand-kit-card:hover .brand-kit-logo {
+                opacity: 0.05;
+                transform: translate(-50%, -50%);
+            }
+            
+            .brand-kit-card:hover .card-menu-btn {
+                opacity: 1;
+            }
+            
+            .asset-card-actions:hover .asset-card-menu {
+                opacity: 0;
+                visibility: hidden;
+                transform: translateY(-10px);
+            }
+            
+            /* Make touch targets larger */
+            button, .nav-item, .card-menu-btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            /* Always show interactive elements on touch devices */
+            .card-menu-btn {
+                opacity: 1 !important;
+            }
+            
+            .asset-card-actions .card-menu-btn {
+                opacity: 1 !important;
+            }
+        }
+        
+        /* Landscape mobile optimization */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .modal-content {
+                margin: 0.5rem;
+                max-height: calc(100vh - 1rem);
+            }
+            
+            .modal-header {
+                padding: 1rem 1.5rem 0.5rem 1.5rem;
+            }
+            
+            .modal-body {
+                padding: 1rem 1.5rem;
+            }
+            
+            .modal-footer {
+                padding: 0.5rem 1.5rem 1rem 1.5rem;
+            }
+        }
+        
+        /* High DPI mobile screens */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .glass-card {
+                border-width: 0.5px;
+            }
+            
+            .modal-content {
+                border-width: 0.5px;
+            }
+        }
+        
+        /* Mobile-specific utility classes */
+        .mobile-view .glass-card:hover:not(.no-hover) {
+            transform: none;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border-color: var(--border-dark);
+        }
+        
+        .touch-device .glow-btn:hover::before {
+            width: 0;
+            height: 0;
+            opacity: 0;
+        }
+        
+        .touch-device .card-menu-btn {
+            opacity: 1 !important;
+        }
+        
+        /* Mobile loading states */
+        @media (max-width: 768px) {
+            .loading-spinner {
+                width: 24px;
+                height: 24px;
+            }
+            
+            .loading-text {
+                font-size: 14px;
+            }
+        }
+        
+        /* Mobile accessibility improvements */
+        @media (max-width: 768px) {
+            /* Focus indicators for mobile */
+            button:focus,
+            input:focus,
+            select:focus,
+            textarea:focus {
+                outline: 2px solid var(--primary);
+                outline-offset: 2px;
+            }
+            
+            /* High contrast mode support */
+            @media (prefers-contrast: high) {
+                .glass-card {
+                    border: 2px solid var(--text-primary);
+                }
+                
+                .glow-btn {
+                    border: 2px solid var(--text-primary);
+                }
+            }
+            
+            /* Reduced motion support */
+            @media (prefers-reduced-motion: reduce) {
+                * {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+        }
     </style>
 </head>
 
@@ -879,8 +1331,8 @@
                             <option value="Team Member">Team Member</option>
                             <option value="Viewer">Viewer</option>
                         </select>
-                        <div id="role-info" class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 mt-2">
-                            <p class="text-xs text-blue-300">
+                        <div id="role-info" class="bg-green-500/10 border border-green-500/30 rounded-lg p-3 mt-2">
+                            <p class="text-xs text-green-300">
                                 <i class="fas fa-info-circle mr-1"></i>
                                 Role description will appear here
                             </p>
@@ -977,8 +1429,8 @@
                            <option value="Admin">Admin</option>
                            <option value="Viewer">Viewer (View Only)</option>
                        </select>
-                       <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 mt-2">
-                           <p class="text-xs text-blue-300">
+                       <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-3 mt-2">
+                           <p class="text-xs text-green-300">
                                <i class="fas fa-info-circle mr-1"></i>
                                <strong>Team Member:</strong> Can download assets and create content<br/>
                                <strong>Admin:</strong> Full access including team management and settings<br/>
@@ -1236,6 +1688,245 @@
                 get: (key, fallback) => JSON.parse(localStorage.getItem(key)) || fallback,
                 set: (key, value) => localStorage.setItem(key, JSON.stringify(value)),
             };
+
+            // --- MOBILE GESTURES & TOUCH INTERACTIONS ---
+            let touchStartX = 0;
+            let touchStartY = 0;
+            let touchEndX = 0;
+            let touchEndY = 0;
+            let isMobileMenuOpen = false;
+
+            // Mobile sidebar swipe gestures
+            function setupMobileGestures() {
+                const mobileSidebar = document.getElementById('mobile-sidebar');
+                const mobileMenuButton = document.getElementById('mobile-menu-button');
+                const closeMobileMenu = document.getElementById('close-mobile-menu');
+
+                if (!mobileSidebar || !mobileMenuButton) return;
+
+                // Touch start
+                document.addEventListener('touchstart', (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                    touchStartY = e.changedTouches[0].screenY;
+                }, { passive: true });
+
+                // Touch end
+                document.addEventListener('touchend', (e) => {
+                    touchEndX = e.changedTouches[0].screenX;
+                    touchEndY = e.changedTouches[0].screenY;
+                    handleSwipe();
+                }, { passive: true });
+
+                // Swipe detection
+                function handleSwipe() {
+                    const deltaX = touchEndX - touchStartX;
+                    const deltaY = touchEndY - touchStartY;
+                    const minSwipeDistance = 50;
+
+                    // Horizontal swipe detection
+                    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
+                        if (deltaX > 0 && touchStartX < 50 && !isMobileMenuOpen) {
+                            // Swipe right from left edge - open menu
+                            openMobileMenu();
+                        } else if (deltaX < 0 && isMobileMenuOpen) {
+                            // Swipe left - close menu
+                            closeMobileMenuHandler();
+                        }
+                    }
+                }
+
+                // Mobile menu functions
+                function openMobileMenu() {
+                    mobileSidebar.classList.remove('hidden');
+                    isMobileMenuOpen = true;
+                    document.body.style.overflow = 'hidden';
+                }
+
+                function closeMobileMenuHandler() {
+                    mobileSidebar.classList.add('hidden');
+                    isMobileMenuOpen = false;
+                    document.body.style.overflow = '';
+                }
+
+                // Event listeners
+                mobileMenuButton.addEventListener('click', openMobileMenu);
+                closeMobileMenu.addEventListener('click', closeMobileMenuHandler);
+                
+                // Close menu when clicking outside
+                mobileSidebar.addEventListener('click', (e) => {
+                    if (e.target === mobileSidebar) {
+                        closeMobileMenuHandler();
+                    }
+                });
+
+                // Close menu when navigating
+                const navItems = mobileSidebar.querySelectorAll('.nav-item');
+                navItems.forEach(item => {
+                    item.addEventListener('click', () => {
+                        setTimeout(closeMobileMenuHandler, 300);
+                    });
+                });
+            }
+
+            // Mobile-optimized modal handling
+            function setupMobileModals() {
+                const modals = document.querySelectorAll('.modal');
+                
+                modals.forEach(modal => {
+                    // Close modal on outside click
+                    modal.addEventListener('click', (e) => {
+                        if (e.target === modal) {
+                            modal.classList.remove('active');
+                            document.body.style.overflow = '';
+                        }
+                    });
+
+                    // Close modal on escape key
+                    document.addEventListener('keydown', (e) => {
+                        if (e.key === 'Escape' && modal.classList.contains('active')) {
+                            modal.classList.remove('active');
+                            document.body.style.overflow = '';
+                        }
+                    });
+
+                    // Prevent body scroll when modal is open
+                    const modalCloseButtons = modal.querySelectorAll('.modal-close');
+                    modalCloseButtons.forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            modal.classList.remove('active');
+                            document.body.style.overflow = '';
+                        });
+                    });
+                });
+            }
+
+            // Mobile table horizontal scroll
+            function setupMobileTables() {
+                const tables = document.querySelectorAll('table');
+                
+                tables.forEach(table => {
+                    const container = table.closest('.table-container') || table.parentElement;
+                    if (container) {
+                        container.style.overflowX = 'auto';
+                        container.style.webkitOverflowScrolling = 'touch';
+                        
+                        // Add scroll indicator
+                        if (window.innerWidth <= 768) {
+                            const scrollIndicator = document.createElement('div');
+                            scrollIndicator.className = 'scroll-indicator';
+                            scrollIndicator.innerHTML = '<i class="fas fa-arrows-alt-h"></i> Scroll horizontally';
+                            scrollIndicator.style.cssText = `
+                                position: absolute;
+                                top: 10px;
+                                right: 10px;
+                                background: rgba(0,0,0,0.7);
+                                color: white;
+                                padding: 4px 8px;
+                                border-radius: 4px;
+                                font-size: 12px;
+                                z-index: 10;
+                                opacity: 0.7;
+                            `;
+                            container.style.position = 'relative';
+                            container.appendChild(scrollIndicator);
+                            
+                            // Hide indicator after scroll
+                            container.addEventListener('scroll', () => {
+                                scrollIndicator.style.opacity = '0';
+                                setTimeout(() => scrollIndicator.remove(), 1000);
+                            });
+                        }
+                    }
+                });
+            }
+
+            // Mobile form optimizations
+            function setupMobileForms() {
+                const inputs = document.querySelectorAll('input, select, textarea');
+                
+                inputs.forEach(input => {
+                    // Prevent zoom on iOS
+                    if (input.type !== 'range') {
+                        input.style.fontSize = '16px';
+                    }
+                    
+                    // Add focus states for mobile
+                    input.addEventListener('focus', () => {
+                        input.style.transform = 'scale(1.02)';
+                        input.style.transition = 'transform 0.2s ease';
+                    });
+                    
+                    input.addEventListener('blur', () => {
+                        input.style.transform = 'scale(1)';
+                    });
+                });
+            }
+
+            // Mobile card interactions
+            function setupMobileCards() {
+                const cards = document.querySelectorAll('.glass-card, .brand-kit-card, .asset-card');
+                
+                cards.forEach(card => {
+                    // Add touch feedback
+                    card.addEventListener('touchstart', () => {
+                        card.style.transform = 'scale(0.98)';
+                        card.style.transition = 'transform 0.1s ease';
+                    }, { passive: true });
+                    
+                    card.addEventListener('touchend', () => {
+                        card.style.transform = 'scale(1)';
+                    }, { passive: true });
+                });
+            }
+
+            // Initialize mobile features
+            function initMobileFeatures() {
+                if (window.innerWidth <= 768) {
+                    setupMobileGestures();
+                    setupMobileModals();
+                    setupMobileTables();
+                    setupMobileForms();
+                    setupMobileCards();
+                }
+            }
+
+            // Run on load and resize
+            initMobileFeatures();
+            window.addEventListener('resize', () => {
+                initMobileFeatures();
+            });
+
+            // Mobile-specific optimizations
+            function optimizeForMobile() {
+                // Disable hover effects on touch devices
+                if ('ontouchstart' in window) {
+                    document.body.classList.add('touch-device');
+                }
+                
+                // Optimize scroll performance
+                document.body.style.webkitOverflowScrolling = 'touch';
+                
+                // Prevent zoom on double tap
+                let lastTouchEnd = 0;
+                document.addEventListener('touchend', function (event) {
+                    const now = (new Date()).getTime();
+                    if (now - lastTouchEnd <= 300) {
+                        event.preventDefault();
+                    }
+                    lastTouchEnd = now;
+                }, false);
+                
+                // Add mobile-specific classes
+                if (window.innerWidth <= 768) {
+                    document.body.classList.add('mobile-view');
+                }
+            }
+
+            // Initialize mobile optimizations
+            optimizeForMobile();
+            window.addEventListener('resize', () => {
+                optimizeForMobile();
+            });
 
             // --- NAVIGATION PERMISSIONS ---
             function updateNavigationPermissions() {
@@ -1646,11 +2337,18 @@
                                 <h2 class="text-xl font-bold mb-4 md:mb-0 text-center md:text-left">Manage Members</h2>
                                 <button class="glow-btn btn-primary px-3 md:px-4 py-1 md:py-2 rounded-full flex items-center text-sm md:text-base" data-modal-target="invite-member-modal" id="invite-member-btn" style="display: none;"><i class="fas fa-user-plus mr-2"></i> Invite Member</button>
                             </div>
-                            <div class="overflow-x-auto">
+                            <div class="table-container overflow-x-auto">
                                 <table class="w-full text-left">
-                                    <thead><tr class="border-b border-[var(--border-dark)]"><th class="p-3">Name</th><th class="p-3 hidden sm:table-cell">Email</th><th class="p-3">Role</th><th class="p-3 text-right">Actions</th></tr></thead>
+                                    <thead>
+                                        <tr class="border-b border-[var(--border-dark)]">
+                                            <th class="p-3 text-sm font-medium text-[var(--text-secondary)]">Name</th>
+                                            <th class="p-3 hidden sm:table-cell text-sm font-medium text-[var(--text-secondary)]">Email</th>
+                                            <th class="p-3 text-sm font-medium text-[var(--text-secondary)]">Role</th>
+                                            <th class="p-3 text-right text-sm font-medium text-[var(--text-secondary)]">Actions</th>
+                                        </tr>
+                                    </thead>
                                     <tbody id="team-members-tbody">
-                                        </tbody>
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
@@ -2461,8 +3159,8 @@
                     
                     // Check if already invited
                     if (pendingInvites.some(inv => inv.email.toLowerCase() === email.toLowerCase())) {
-                        validationDiv.innerHTML = '<i class="fas fa-info-circle text-blue-500 mr-1"></i>This user has already been invited';
-                        validationDiv.className = 'text-xs mt-1 text-blue-500';
+                        validationDiv.innerHTML = '<i class="fas fa-info-circle text-green-500 mr-1"></i>This user has already been invited';
+                        validationDiv.className = 'text-xs mt-1 text-green-500';
                         validationDiv.classList.remove('hidden');
                         return false;
                     }
@@ -4836,24 +5534,26 @@
                 // Current user row with enhanced styling
                 tbody.innerHTML += `
                     <tr class="border-b border-[var(--border-dark)] bg-gradient-to-r from-purple-500/5 to-transparent">
-                        <td class="p-4">
+                        <td class="p-3 md:p-4">
                             <div class="flex items-center space-x-3">
-                                <div class="w-10 h-10 bg-gradient-to-br ${roleColor} rounded-full flex items-center justify-center">
-                                    <i class="${roleIcon} text-white text-sm"></i>
+                                <div class="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br ${roleColor} rounded-full flex items-center justify-center flex-shrink-0">
+                                    <i class="${roleIcon} text-white text-xs md:text-sm"></i>
                                 </div>
-                                <div>
-                            <p class="font-medium">${currentUser.full_name} (You)</p>
-                            <p class="sm:hidden text-xs text-[var(--text-secondary)]">${currentUser.email}</p>
+                                <div class="min-w-0 flex-1">
+                                    <p class="font-medium text-sm md:text-base truncate">${currentUser.full_name} (You)</p>
+                                    <p class="sm:hidden text-xs text-[var(--text-secondary)] truncate">${currentUser.email}</p>
                                 </div>
                             </div>
                         </td>
-                        <td class="p-4 hidden sm:table-cell text-[var(--text-secondary)]">${currentUser.email}</td>
-                        <td class="p-4">
-                            <span class="status-badge bg-gradient-to-r ${roleColor} text-white px-3 py-1 rounded-full text-xs font-medium">
+                        <td class="p-3 md:p-4 hidden sm:table-cell text-[var(--text-secondary)] text-sm">
+                            <span class="truncate block">${currentUser.email}</span>
+                        </td>
+                        <td class="p-3 md:p-4">
+                            <span class="status-badge bg-gradient-to-r ${roleColor} text-white px-2 md:px-3 py-1 rounded-full text-xs font-medium inline-block">
                                 <i class="${roleIcon} mr-1"></i>${userRole}
                             </span>
                         </td>
-                        <td class="p-4 text-right text-[var(--text-secondary)]">
+                        <td class="p-3 md:p-4 text-right text-[var(--text-secondary)]">
                             <span class="text-xs">${isOwner ? 'Full Access' : 'Limited Access'}</span>
                         </td>
                     </tr>
@@ -4867,31 +5567,35 @@
                     
                     const row = `
                         <tr class="border-b border-[var(--border-dark)] hover:bg-white/5 transition-colors">
-                            <td class="p-4">
+                            <td class="p-3 md:p-4">
                                 <div class="flex items-center space-x-3">
-                                    <div class="w-10 h-10 bg-gradient-to-br ${roleColor} rounded-full flex items-center justify-center">
-                                        <i class="${roleIcon} text-white text-sm"></i>
+                                    <div class="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br ${roleColor} rounded-full flex items-center justify-center flex-shrink-0">
+                                        <i class="${roleIcon} text-white text-xs md:text-sm"></i>
                                     </div>
-                                    <div>
-                                <p class="font-medium">${member.name}</p>
-                                <p class="sm:hidden text-xs text-[var(--text-secondary)]">${member.email}</p>
+                                    <div class="min-w-0 flex-1">
+                                        <p class="font-medium text-sm md:text-base truncate">${member.name}</p>
+                                        <p class="sm:hidden text-xs text-[var(--text-secondary)] truncate">${member.email}</p>
                                     </div>
                                 </div>
                             </td>
-                            <td class="p-4 hidden sm:table-cell text-[var(--text-secondary)]">${member.email}</td>
-                            <td class="p-4">
-                                <span class="status-badge ${roleColor} text-white px-3 py-1 rounded-full text-xs font-medium">
+                            <td class="p-3 md:p-4 hidden sm:table-cell text-[var(--text-secondary)] text-sm">
+                                <span class="truncate block">${member.email}</span>
+                            </td>
+                            <td class="p-3 md:p-4">
+                                <span class="status-badge ${roleColor} text-white px-2 md:px-3 py-1 rounded-full text-xs font-medium inline-block">
                                     <i class="${roleIcon} mr-1"></i>${member.role}
                                 </span>
                             </td>
-                            <td class="p-4 text-right space-x-2 whitespace-nowrap">
+                            <td class="p-3 md:p-4 text-right">
                                 ${hasAdminPermissions() ? `
-                                <button data-id="${member.id}" class="edit-member-btn text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 px-3 py-1 rounded-md transition-colors text-sm">
-                                    <i class="fas fa-edit mr-1"></i>Edit
-                                </button>
-                                <button data-id="${member.id}" class="remove-member-btn text-[#9c7ead] hover:text-red-500 hover:bg-red-500/10 px-3 py-1 rounded-md transition-colors text-sm">
-                                    <i class="fas fa-user-times mr-1"></i>Remove
-                                </button>
+                                <div class="flex flex-col sm:flex-row gap-1 sm:gap-2">
+                                    <button data-id="${member.id}" class="edit-member-btn text-green-400 hover:text-green-300 hover:bg-green-500/10 px-2 md:px-3 py-1 rounded-md transition-colors text-xs md:text-sm min-h-[32px] md:min-h-[36px]">
+                                        <i class="fas fa-edit mr-1"></i><span class="hidden sm:inline">Edit</span>
+                                    </button>
+                                    <button data-id="${member.id}" class="remove-member-btn text-[#9c7ead] hover:text-red-500 hover:bg-red-500/10 px-2 md:px-3 py-1 rounded-md transition-colors text-xs md:text-sm min-h-[32px] md:min-h-[36px]">
+                                        <i class="fas fa-user-times mr-1"></i><span class="hidden sm:inline">Remove</span>
+                                    </button>
+                                </div>
                                 ` : '<span class="text-xs text-[var(--text-secondary)]">View Only</span>'}
                             </td>
                         </tr>
