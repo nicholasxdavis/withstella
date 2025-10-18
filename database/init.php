@@ -92,12 +92,15 @@ $tables = [
             file_path VARCHAR(512) NULL,
             share_token VARCHAR(64) NULL UNIQUE,
             file_size INT NULL,
+            nextcloud_file_id VARCHAR(255) NULL,
+            nextcloud_etag VARCHAR(255) NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             INDEX idx_user_id (user_id),
             INDEX idx_brand_kit_id (brand_kit_id),
             INDEX idx_type (type),
             INDEX idx_share_token (share_token),
+            INDEX idx_nextcloud_file_id (nextcloud_file_id),
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
             FOREIGN KEY (brand_kit_id) REFERENCES brand_kits(id) ON DELETE SET NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
@@ -321,6 +324,35 @@ try {
     }
 } catch (PDOException $e) {
     echo "✗ Error ensuring governance_rules.config column: {$e->getMessage()}\n";
+}
+
+// Ensure assets table has Nextcloud columns
+try {
+    // Check for nextcloud_file_id column
+    $colStmt = $pdo->query("SHOW COLUMNS FROM assets LIKE 'nextcloud_file_id'");
+    $col = $colStmt ? $colStmt->fetch(PDO::FETCH_ASSOC) : false;
+    if (!$col) {
+        $pdo->exec("ALTER TABLE assets ADD COLUMN nextcloud_file_id VARCHAR(255) NULL AFTER file_size");
+        echo "✓ Column 'nextcloud_file_id' added to 'assets'\n";
+    }
+    
+    // Check for nextcloud_etag column
+    $colStmt = $pdo->query("SHOW COLUMNS FROM assets LIKE 'nextcloud_etag'");
+    $col = $colStmt ? $colStmt->fetch(PDO::FETCH_ASSOC) : false;
+    if (!$col) {
+        $pdo->exec("ALTER TABLE assets ADD COLUMN nextcloud_etag VARCHAR(255) NULL AFTER nextcloud_file_id");
+        echo "✓ Column 'nextcloud_etag' added to 'assets'\n";
+    }
+    
+    // Add index for nextcloud_file_id if it doesn't exist
+    $indexStmt = $pdo->query("SHOW INDEX FROM assets WHERE Key_name = 'idx_nextcloud_file_id'");
+    $index = $indexStmt ? $indexStmt->fetch(PDO::FETCH_ASSOC) : false;
+    if (!$index) {
+        $pdo->exec("ALTER TABLE assets ADD INDEX idx_nextcloud_file_id (nextcloud_file_id)");
+        echo "✓ Index 'idx_nextcloud_file_id' added to 'assets'\n";
+    }
+} catch (PDOException $e) {
+    echo "✗ Error ensuring assets Nextcloud columns: {$e->getMessage()}\n";
 }
 
 echo "\n";

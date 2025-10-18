@@ -28,6 +28,9 @@ require_once dirname(__DIR__) . '/app/Services/NextcloudStorage.php';
 require_once __DIR__ . '/auth_helper.php';
 use App\Services\NextcloudStorage;
 
+// Ensure database structure is up to date
+require_once dirname(__DIR__) . '/database/init.php';
+
 // Database connection
 $host = getenv('DB_HOST') ?: 'mariadb-database-rgcs4ksokcww0g04wkwg4g4k';
 $dbname = getenv('DB_DATABASE') ?: 'default';
