@@ -1567,10 +1567,9 @@
                          </div>
                     </div>
                 `;
-                 // Check if current user has admin permissions
+                 // Build team settings page content based on user permissions
                  const hasAdmin = hasAdminPermissions();
-                 
-                 document.getElementById('team-settings-page').innerHTML = `
+                 let teamSettingsContent = `
                     <h1 class="text-2xl font-bold mb-6 text-gray-900 text-center md:text-left">Settings</h1>
                     <div class="space-y-6">
                         <div class="glass-card p-6 rounded-2xl">
@@ -1585,10 +1584,13 @@
                                         </tbody>
                                 </table>
                             </div>
-                        </div>
-                        ${hasAdmin ? `<div class="glass-card p-6 rounded-2xl">
-                            <h2 class="text-xl font-bold mb-6 text-center md:text-left">Workspace Permissions</h2>` : ''}
-                            <div class="space-y-4">
+                        </div>`;
+                 
+                 if (hasAdmin) {
+                     teamSettingsContent += `
+                        <div class="glass-card p-6 rounded-2xl">
+                            <h2 class="text-xl font-bold mb-6 text-center md:text-left">Workspace Permissions</h2>
+                            <div class="space-y-4">`;
                                 <div class="flex justify-between items-center p-3 bg-white/5 rounded-3xl">
                                     <div class="flex-1 pr-4">
                                         <p class="font-medium">Team Members Can Upload</p>
@@ -1641,9 +1643,9 @@
                                     <label class="switch"><input type="checkbox" checked disabled><span class="slider"></span></label>
                                 </div>
                             </div>
-                        </div>` : ''}
-                        ${hasAdmin ? `<div class="glass-card p-6 rounded-2xl">
-                            <h2 class="text-xl font-bold mb-6 text-center md:text-left">Download Requests</h2>` : ''}
+                        </div>
+                        <div class="glass-card p-6 rounded-2xl">
+                            <h2 class="text-xl font-bold mb-6 text-center md:text-left">Download Requests</h2>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left">
                                     <thead>
@@ -1665,9 +1667,14 @@
                                     </tbody>
                                 </table>
                             </div>
-                        </div>` : ''}
+                        </div>`;
+                 }
+                 
+                 teamSettingsContent += `
                     </div>
                 `;
+                 
+                 document.getElementById('team-settings-page').innerHTML = teamSettingsContent;
                  document.getElementById('governance-page').innerHTML = `
                     <div class="flex flex-col md:flex-row justify-between items-center mb-6">
                         <div>
