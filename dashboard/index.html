@@ -2060,6 +2060,57 @@
                 }
             }
 
+            // Helper function to update asset thumbnails with Nextcloud file info
+            async function updateAssetThumbnails() {
+                try {
+                    showToast('Starting thumbnail update...', 'info');
+                    
+                    // Step 1: Check if columns exist
+                    const checkResponse = await fetch('/api/update_assets.php?action=check-columns');
+                    const checkData = await checkResponse.json();
+                    
+                    if (!checkData.success) {
+                        showToast('Failed to check database structure', 'error');
+                        return;
+                    }
+                    
+                    // Step 2: Add missing columns if needed
+                    if (!checkData.has_nextcloud_file_id || !checkData.has_nextcloud_etag) {
+                        showToast('Adding missing database columns...', 'info');
+                        const addResponse = await fetch('/api/update_assets.php?action=add-columns');
+                        const addData = await addResponse.json();
+                        
+                        if (!addData.success) {
+                            showToast('Failed to add database columns', 'error');
+                            return;
+                        }
+                    }
+                    
+                    // Step 3: Update existing assets
+                    showToast('Updating assets with Nextcloud file info...', 'info');
+                    const updateResponse = await fetch('/api/update_assets.php?action=update-assets');
+                    const updateData = await updateResponse.json();
+                    
+                    if (updateData.success) {
+                        showToast(`Updated ${updateData.updated_count} assets successfully!`, 'success');
+                        
+                        // Refresh the assets to show updated thumbnails
+                        await loadAssetsFromAPI();
+                        renderAssets();
+                        
+                        if (updateData.errors && updateData.errors.length > 0) {
+                            console.warn('Some assets could not be updated:', updateData.errors);
+                        }
+                    } else {
+                        showToast('Failed to update assets: ' + updateData.message, 'error');
+                    }
+                    
+                } catch (error) {
+                    console.error('Error updating thumbnails:', error);
+                    showToast('Error updating thumbnails: ' + error.message, 'error');
+                }
+            }
+
             // Helper function to delete asset from database and Nextcloud
             async function deleteAsset(assetId) {
                 try {
@@ -2071,6 +2122,11 @@
                         // Remove from local state
                         assets = assets.filter(asset => asset.id !== assetId);
                         ls.set(getUserDataKey('stella_assets'), assets);
+                        
+                        // Remove saved URL from localStorage
+                        const savedUrls = JSON.parse(localStorage.getItem('stella_asset_urls') || '{}');
+                        delete savedUrls[assetId];
+                        localStorage.setItem('stella_asset_urls', JSON.stringify(savedUrls));
                         
                         // Also remove from brand kits
                         brandKits.forEach(kit => {
@@ -2572,9 +2628,14 @@
                             <h1 class="text-2xl font-bold text-gray-900">API Access</h1>
                             <p class="text-gray-600 mt-1">Integrate Stella into your workflows</p>
                         </div>
-                        <button onclick="document.getElementById('api-key-modal').classList.add('active')" class="glow-btn btn-primary px-4 py-2 rounded-full flex items-center mt-4 md:mt-0">
-                            <i class="fas fa-plus mr-2"></i> Generate API Key
-                        </button>
+                        <div class="flex gap-3 mt-4 md:mt-0">
+                            <button onclick="document.getElementById('api-key-modal').classList.add('active')" class="glow-btn btn-primary px-4 py-2 rounded-full flex items-center">
+                                <i class="fas fa-plus mr-2"></i> Generate API Key
+                            </button>
+                            <button onclick="updateAssetThumbnails()" class="bg-purple-500/20 text-purple-400 border border-purple-500/30 rounded-lg px-4 py-2 hover:bg-purple-500/30 transition-colors">
+                                <i class="fas fa-image mr-2"></i> Fix Thumbnails
+                            </button>
+                        </div>
                                     </div>
                     <div class="space-y-6">
                         <div class="glass-card p-6 rounded-2xl">
@@ -4330,15 +4391,47 @@
                     }
 
                     if (copyBtn) {
-                        const url = copyBtn.dataset.url;
+                        const assetCard = copyBtn.closest('.asset-card');
+                        const assetId = assetCard?.dataset.id;
+                        let url = copyBtn.dataset.url;
+                        
+                        // If no URL or invalid URL, try to get from localStorage or generate new one
                         if (!url || url === '#no-share-token') {
-                            showToast('Share link not available for this asset', 'error');
-                            return;
+                            if (assetId) {
+                                // Try to get saved URL from localStorage
+                                const savedUrls = JSON.parse(localStorage.getItem('stella_asset_urls') || '{}');
+                                url = savedUrls[assetId];
+                                
+                                if (!url) {
+                                    // Generate new URL using share token
+                                    const asset = assets.find(a => a.id == assetId);
+                                    if (asset && asset.share_token) {
+                                        const baseUrl = window.location.origin;
+                                        url = `${baseUrl}/public/view.php?t=${asset.share_token}`;
+                                        
+                                        // Save the URL for future use
+                                        savedUrls[assetId] = url;
+                                        localStorage.setItem('stella_asset_urls', JSON.stringify(savedUrls));
+                                    }
+                                }
+                            }
+                            
+                            if (!url || url === '#no-share-token') {
+                                showToast('Share link not available for this asset', 'error');
+                                return;
+                            }
                         }
                         
                         if (navigator.clipboard && navigator.clipboard.writeText) {
                             navigator.clipboard.writeText(url).then(() => {
                                 showToast('URL copied to clipboard!', 'success');
+                                
+                                // Save URL for future use if not already saved
+                                if (assetId) {
+                                    const savedUrls = JSON.parse(localStorage.getItem('stella_asset_urls') || '{}');
+                                    savedUrls[assetId] = url;
+                                    localStorage.setItem('stella_asset_urls', JSON.stringify(savedUrls));
+                                }
                             }).catch((err) => {
                                 console.error('Clipboard failed:', err);
                                 fallbackCopyToClipboard(url);
@@ -4405,7 +4498,7 @@
                         const isImage = asset.type.startsWith('image/');
                         const card = document.createElement('div');
                         card.className = 'asset-card glass-card p-3 rounded-lg flex flex-col';
-                        card.dataset.assetId = asset.id;
+                        card.dataset.id = asset.id;
 
                         if (asset.name.toLowerCase().includes('black')) {
                             card.classList.add('light-bg');
@@ -4603,6 +4696,7 @@
                         const isImage = asset.type.startsWith('image/');
                         const card = document.createElement('div');
                         card.className = 'asset-card glass-card p-3 rounded-lg flex flex-col';
+                        card.dataset.id = asset.id;
                         
                         if (asset.name.toLowerCase().includes('black')) {
                             card.classList.add('light-bg');
@@ -4757,10 +4851,35 @@
                     }
 
                     if(copyBtn) {
-                        const url = copyBtn.dataset.url;
+                        const assetCard = copyBtn.closest('.asset-card');
+                        const assetId = assetCard?.dataset.id;
+                        let url = copyBtn.dataset.url;
+                        
+                        // If no URL or invalid URL, try to get from localStorage or generate new one
                         if (!url || url === '#no-share-token') {
-                            showToast('Share link not available for this asset', 'error');
-                            return;
+                            if (assetId) {
+                                // Try to get saved URL from localStorage
+                                const savedUrls = JSON.parse(localStorage.getItem('stella_asset_urls') || '{}');
+                                url = savedUrls[assetId];
+                                
+                                if (!url) {
+                                    // Generate new URL using share token
+                                    const asset = assets.find(a => a.id == assetId);
+                                    if (asset && asset.share_token) {
+                                        const baseUrl = window.location.origin;
+                                        url = `${baseUrl}/public/view.php?t=${asset.share_token}`;
+                                        
+                                        // Save the URL for future use
+                                        savedUrls[assetId] = url;
+                                        localStorage.setItem('stella_asset_urls', JSON.stringify(savedUrls));
+                                    }
+                                }
+                            }
+                            
+                            if (!url || url === '#no-share-token') {
+                                showToast('Share link not available for this asset', 'error');
+                                return;
+                            }
                         }
                         
                         // Try modern clipboard API first
@@ -4768,8 +4887,15 @@
                             navigator.clipboard.writeText(url).then(() => {
                                 showToast('URL copied to clipboard!', 'success');
                                 
+                                // Save URL for future use if not already saved
+                                if (assetId) {
+                                    const savedUrls = JSON.parse(localStorage.getItem('stella_asset_urls') || '{}');
+                                    savedUrls[assetId] = url;
+                                    localStorage.setItem('stella_asset_urls', JSON.stringify(savedUrls));
+                                }
+                                
                                 // Track activity
-                                const assetName = copyBtn.closest('.asset-card')?.querySelector('.asset-name')?.textContent || 'Unknown asset';
+                                const assetName = assetCard?.querySelector('.asset-name')?.textContent || 'Unknown asset';
                                 trackActivity('copy', `Copied URL for asset: ${assetName}`, { asset_name: assetName, url: url });
                             }).catch((err) => {
                                 console.error('Clipboard API failed:', err);
