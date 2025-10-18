@@ -475,9 +475,9 @@ $fileSize = round($asset['file_size'] / 1024, 2);
             <div class="content">
                 <div class="preview">
                     <?php if ($isImage): ?>
-                        <img src="/api/image_proxy.php?id=<?php echo $asset['id']; ?>&t=<?php echo $token; ?>" 
+                        <img src="/api/image_proxy.php?t=<?php echo $token; ?>&size=600" 
                              alt="<?php echo htmlspecialchars($asset['name']); ?>"
-                             onerror="this.style.display='none'; this.parentElement.innerHTML='<div><i class=\'fas fa-image\'></i><p class=\'preview-text\'>Preview not available</p></div>'">
+                             onerror="this.style.display='none'; this.parentElement.innerHTML='<div><i class=\'fas fa-image\'></i><p class=\'preview-text\'>Preview not available for this file type</p></div>'">
                     <?php else: ?>
                         <div>
                             <i class="fas fa-file-alt"></i>
@@ -511,7 +511,7 @@ $fileSize = round($asset['file_size'] / 1024, 2);
                 </div>
 
                 <div class="actions">
-                    <a href="/api/image_proxy.php?id=<?php echo $asset['id']; ?>&download=true&t=<?php echo $token; ?>" 
+                    <a href="/api/image_proxy.php?t=<?php echo $token; ?>&download=true" 
                        class="btn btn-primary">
                         <i class="fas fa-download"></i>
                         <span>Download</span>
