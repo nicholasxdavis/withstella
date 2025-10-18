@@ -29,6 +29,7 @@ require_once __DIR__ . '/auth_helper.php';
 use App\Services\NextcloudStorage;
 
 // Ensure database structure is up to date
+define('SUPPRESS_DB_OUTPUT', true);
 require_once dirname(__DIR__) . '/database/init.php';
 
 // Database connection

@@ -10,14 +10,25 @@ $dbname = getenv('DB_DATABASE') ?: 'default';
 $user = getenv('DB_USERNAME') ?: 'mariadb';
 $pass = getenv('DB_PASSWORD') ?: 'ba55Ko1lA8FataxMYnpl9qVploHFJXZKqCvfnwrlcxvISIqbQusX4qFeELhdYPdO';
 
+// Check if we're being included in an API file (suppress output)
+$is_api_context = (strpos($_SERVER['REQUEST_URI'] ?? '', '/api/') !== false) || 
+                  (strpos($_SERVER['PHP_SELF'] ?? '', '/api/') !== false) ||
+                  (defined('SUPPRESS_DB_OUTPUT') && SUPPRESS_DB_OUTPUT);
+
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $user, $pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
     $connected_host = $host;
-    echo "✓ Connected to database at: {$host}\n";
+    if (!$is_api_context) {
+        echo "✓ Connected to database at: {$host}\n";
+    }
 } catch(PDOException $e) {
-    die("✗ Database connection failed: " . $e->getMessage() . "\n");
+    if ($is_api_context) {
+        throw new Exception("Database connection failed: " . $e->getMessage());
+    } else {
+        die("✗ Database connection failed: " . $e->getMessage() . "\n");
+    }
 }
 
 // Define tables to create
@@ -298,10 +309,14 @@ $errors = 0;
 foreach ($tables as $table_name => $sql) {
     try {
         $pdo->exec($sql);
-        echo "✓ Table '{$table_name}' ready\n";
+        if (!$is_api_context) {
+            echo "✓ Table '{$table_name}' ready\n";
+        }
         $created++;
     } catch (PDOException $e) {
-        echo "✗ Error creating table '{$table_name}': {$e->getMessage()}\n";
+        if (!$is_api_context) {
+            echo "✗ Error creating table '{$table_name}': {$e->getMessage()}\n";
+        }
         $errors++;
     }
 }
@@ -312,18 +327,24 @@ try {
     $col = $colStmt ? $colStmt->fetch(PDO::FETCH_ASSOC) : false;
     if (!$col) {
         $pdo->exec("ALTER TABLE governance_rules ADD COLUMN config JSON NULL AFTER rule_value");
-        echo "✓ Column 'config' added to 'governance_rules'\n";
+        if (!$is_api_context) {
+            echo "✓ Column 'config' added to 'governance_rules'\n";
+        }
     } else {
         // Ensure it allows NULL to avoid insert errors
         $fullColStmt = $pdo->query("SHOW FULL COLUMNS FROM governance_rules LIKE 'config'");
         $fullCol = $fullColStmt ? $fullColStmt->fetch(PDO::FETCH_ASSOC) : false;
         if ($fullCol && strtoupper($fullCol['Null']) === 'NO') {
             $pdo->exec("ALTER TABLE governance_rules MODIFY COLUMN config JSON NULL");
-            echo "✓ Column 'config' modified to allow NULL in 'governance_rules'\n";
+            if (!$is_api_context) {
+                echo "✓ Column 'config' modified to allow NULL in 'governance_rules'\n";
+            }
         }
     }
 } catch (PDOException $e) {
-    echo "✗ Error ensuring governance_rules.config column: {$e->getMessage()}\n";
+    if (!$is_api_context) {
+        echo "✗ Error ensuring governance_rules.config column: {$e->getMessage()}\n";
+    }
 }
 
 // Ensure assets table has Nextcloud columns
@@ -333,7 +354,9 @@ try {
     $col = $colStmt ? $colStmt->fetch(PDO::FETCH_ASSOC) : false;
     if (!$col) {
         $pdo->exec("ALTER TABLE assets ADD COLUMN nextcloud_file_id VARCHAR(255) NULL AFTER file_size");
-        echo "✓ Column 'nextcloud_file_id' added to 'assets'\n";
+        if (!$is_api_context) {
+            echo "✓ Column 'nextcloud_file_id' added to 'assets'\n";
+        }
     }
     
     // Check for nextcloud_etag column
@@ -341,7 +364,9 @@ try {
     $col = $colStmt ? $colStmt->fetch(PDO::FETCH_ASSOC) : false;
     if (!$col) {
         $pdo->exec("ALTER TABLE assets ADD COLUMN nextcloud_etag VARCHAR(255) NULL AFTER nextcloud_file_id");
-        echo "✓ Column 'nextcloud_etag' added to 'assets'\n";
+        if (!$is_api_context) {
+            echo "✓ Column 'nextcloud_etag' added to 'assets'\n";
+        }
     }
     
     // Add index for nextcloud_file_id if it doesn't exist
@@ -349,22 +374,28 @@ try {
     $index = $indexStmt ? $indexStmt->fetch(PDO::FETCH_ASSOC) : false;
     if (!$index) {
         $pdo->exec("ALTER TABLE assets ADD INDEX idx_nextcloud_file_id (nextcloud_file_id)");
-        echo "✓ Index 'idx_nextcloud_file_id' added to 'assets'\n";
+        if (!$is_api_context) {
+            echo "✓ Index 'idx_nextcloud_file_id' added to 'assets'\n";
+        }
     }
 } catch (PDOException $e) {
-    echo "✗ Error ensuring assets Nextcloud columns: {$e->getMessage()}\n";
+    if (!$is_api_context) {
+        echo "✗ Error ensuring assets Nextcloud columns: {$e->getMessage()}\n";
+    }
 }
 
-echo "\n";
-echo "========================================\n";
-echo "Database Initialization Complete\n";
-echo "========================================\n";
-echo "Connected to: {$connected_host}\n";
-echo "Database: {$dbname}\n";
-echo "Tables processed: " . count($tables) . "\n";
-echo "Success: {$created}\n";
-echo "Errors: {$errors}\n";
-echo "========================================\n";
+if (!$is_api_context) {
+    echo "\n";
+    echo "========================================\n";
+    echo "Database Initialization Complete\n";
+    echo "========================================\n";
+    echo "Connected to: {$connected_host}\n";
+    echo "Database: {$dbname}\n";
+    echo "Tables processed: " . count($tables) . "\n";
+    echo "Success: {$created}\n";
+    echo "Errors: {$errors}\n";
+    echo "========================================\n";
+}
 
 return [
     'success' => $errors === 0,

@@ -25,6 +25,7 @@ require_once __DIR__ . '/team_permissions.php';
 use App\Services\NextcloudStorage;
 
 // Ensure database structure is up to date
+define('SUPPRESS_DB_OUTPUT', true);
 require_once dirname(__DIR__) . '/database/init.php';
 
 // Database connection
