@@ -151,8 +151,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		// Generate unique share token for public access
 		$shareToken = bin2hex(random_bytes(16)); // 32-character token
 		
+		// Get file info from Nextcloud to get file ID and etag
+		$fileInfo = null;
+		if ($storageDriver === 'nextcloud' && !empty($publicPath)) {
+			try {
+				$storage = new NextcloudStorage($ncCreds['nextcloud_username'], $ncCreds['nextcloud_password']);
+				$fileInfo = $storage->getFileInfo($publicPath);
+			} catch (Exception $e) {
+				// Continue without file info if it fails
+			}
+		}
+		
 		// Save metadata to database
-		$stmt = $pdo->prepare("INSERT INTO assets (user_id, brand_kit_id, name, type, file_url, file_path, share_token, file_size, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
+		$stmt = $pdo->prepare("INSERT INTO assets (user_id, brand_kit_id, name, type, file_url, file_path, share_token, file_size, nextcloud_file_id, nextcloud_etag, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
 		$stmt->execute([
 			$effectiveUserId,
 			$brandKitId,
@@ -161,13 +172,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			$fileUrl,
 			$publicPath,
 			$shareToken,
-			$file['size']
+			$file['size'],
+			$fileInfo['file_id'] ?? null,
+			$fileInfo['etag'] ?? null
 		]);
 
 		$assetId = $pdo->lastInsertId();
 
 		// Build URLs for frontend
 		$baseAppUrl = getBaseUrl();
+		
+		// Generate Nextcloud preview URL if file info is available
+		$previewUrl = null;
+		if ($fileInfo && $fileInfo['file_id']) {
+			$baseUrl = rtrim($ncCreds['nextcloud_url'] ?? 'https://cloud.blacnova.net', '/');
+			$previewUrl = $baseUrl . '/core/preview?' . http_build_query([
+				'fileId' => $fileInfo['file_id'],
+				'x' => 1920,
+				'y' => 1080,
+				'a' => 'true',
+				'etag' => $fileInfo['etag'] ?? ''
+			]);
+		}
 		
 		$response = [
 			'success' => true,
@@ -178,11 +204,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 				'type' => $type,
 				'url' => $baseAppUrl . '/public/view.php?t=' . $shareToken, // Public share link
 				'download_url' => $baseAppUrl . '/api/image_proxy.php?id=' . $assetId . '&download=true', // Authenticated download
-				'preview_url' => $baseAppUrl . '/api/image_proxy.php?id=' . $assetId, // Authenticated preview
+				'preview_url' => $previewUrl ?: ($baseAppUrl . '/api/image_proxy.php?id=' . $assetId), // Nextcloud preview or fallback
 				'share_token' => $shareToken,
 				'size' => $file['size'],
 				'path' => $publicPath,
-				'internal_path' => $fileUrl
+				'internal_path' => $fileUrl,
+				'nextcloud_file_id' => $fileInfo['file_id'] ?? null,
+				'nextcloud_etag' => $fileInfo['etag'] ?? null
 			]
 		];
 

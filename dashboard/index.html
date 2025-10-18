@@ -4062,10 +4062,10 @@
                     card.className = 'glass-card brand-kit-card aspect-square rounded-2xl p-4 flex flex-col';
                     card.dataset.kitId = kit.id;
 
-                    // Build proper logo URL using share token if available
+                    // Build proper logo URL using preview_url from API if available
                     const logoAsset = assets.find(a => a.id === kit.logo_asset_id);
                     const logoHtml = kit.logo_asset_id && logoAsset ? `
-                        <img src="${logoAsset.share_token ? `/api/image_proxy.php?t=${logoAsset.share_token}&size=200` : `/api/image_proxy.php?id=${kit.logo_asset_id}&size=200`}" 
+                        <img src="${logoAsset.preview_url || (logoAsset.share_token ? `/api/image_proxy.php?t=${logoAsset.share_token}&size=200` : `/api/image_proxy.php?id=${kit.logo_asset_id}&size=200`)}" 
                              class="brand-kit-logo" 
                              alt="${kit.name} Logo" 
                              onload="this.style.opacity='0.05'"
@@ -4608,8 +4608,8 @@
                             card.classList.add('light-bg');
                         }
 
-                        // Build proper image URLs using share tokens for public access
-                        const previewUrl = isImage && asset.share_token ? `/api/image_proxy.php?t=${asset.share_token}&size=300` : null;
+                        // Use preview URL from API if available, otherwise fallback to image proxy
+                        const previewUrl = isImage ? (asset.preview_url || (asset.share_token ? `/api/image_proxy.php?t=${asset.share_token}&size=300` : null)) : null;
                         const downloadLink = asset.share_token ? `/api/image_proxy.php?t=${asset.share_token}&download=true` : `/api/image_proxy.php?id=${asset.id}&download=true`;
                         const shareLink = asset.share_token ? `/public/view.php?t=${asset.share_token}` : `#no-share-token`;
                         

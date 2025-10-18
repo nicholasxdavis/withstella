@@ -87,6 +87,17 @@ switch ($action) {
 					$asset['public_url'] = $baseUrl . '/public/view.php?t=' . $shareToken;
 				}
 				
+				// Generate Nextcloud preview URL if file ID and etag are available
+				if (!empty($asset['nextcloud_file_id']) && !empty($asset['nextcloud_etag'])) {
+					$asset['preview_url'] = 'https://cloud.blacnova.net/core/preview?' . http_build_query([
+						'fileId' => $asset['nextcloud_file_id'],
+						'x' => 1920,
+						'y' => 1080,
+						'a' => 'true',
+						'etag' => $asset['nextcloud_etag']
+					]);
+				}
+				
 				// Check download permissions
 				$downloadCheck = checkDownloadPermission($pdo, $userId, $asset['id']);
 				$asset['can_download'] = $downloadCheck['can_download'];
