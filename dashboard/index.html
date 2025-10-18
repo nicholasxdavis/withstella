@@ -599,10 +599,12 @@
                     <i class="fas fa-folder-open w-5 text-center"></i>
                     <span>Asset Hub</span>
                 </div>
+                ${hasAdminPermissions() ? `
                 <div class="nav-item p-3 rounded-3xl flex items-center space-x-3 text-white" data-page="team-settings">
                     <i class="fas fa-users-cog w-5 text-center"></i>
                     <span>Team Settings</span>
                 </div>
+                ` : ''}
                 <div class="nav-item p-3 rounded-3xl flex items-center space-x-3 text-white" data-page="api">
                     <i class="fas fa-code w-5 text-center"></i>
                     <span>Stella Api</span>
@@ -661,10 +663,12 @@
                             <i class="fas fa-folder-open w-5 text-center"></i>
                             <span>Asset Hub</span>
                         </div>
+                        ${hasAdminPermissions() ? `
                         <div class="nav-item p-3 rounded-3xl flex items-center space-x-3 text-white" data-page="team-settings">
                             <i class="fas fa-users-cog w-5 text-center"></i>
                             <span>Team Settings</span>
                         </div>
+                        ` : ''}
                         <div class="nav-item p-3 rounded-3xl flex items-center space-x-3 text-white" data-page="api">
                             <i class="fas fa-code w-5 text-center"></i>
                             <span>Stella Api</span>
@@ -1494,7 +1498,7 @@
                         </div>
                         <div class="lg:col-span-1 space-y-6">
                             <div class="glass-card p-6">
-                                <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold">Team Overview</h2><button class="glow-btn btn-secondary px-3 py-1 rounded-full text-sm" onclick="document.querySelector('.nav-item[data-page=\\'team-settings\\']').click()">Manage</button></div>
+                                <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold">Team Overview</h2>${hasAdminPermissions() ? '<button class="glow-btn btn-secondary px-3 py-1 rounded-full text-sm" onclick="document.querySelector(\'.nav-item[data-page=\\\'team-settings\\\']\').click()">Manage</button>' : ''}</div>
                                 <div class="flex items-center space-x-4 p-3 bg-white/5 rounded-3xl mb-4">
                                     <div class="stat-icon text-2xl w-12 h-12"><i class="fas fa-users"></i></div>
                                     <div>
@@ -1563,13 +1567,16 @@
                          </div>
                     </div>
                 `;
+                 // Check if current user has admin permissions
+                 const hasAdmin = hasAdminPermissions();
+                 
                  document.getElementById('team-settings-page').innerHTML = `
                     <h1 class="text-2xl font-bold mb-6 text-gray-900 text-center md:text-left">Settings</h1>
                     <div class="space-y-6">
                         <div class="glass-card p-6 rounded-2xl">
                             <div class="flex flex-col md:flex-row justify-between items-center mb-6">
                                 <h2 class="text-xl font-bold mb-4 md:mb-0 text-center md:text-left">Manage Members</h2>
-                                <button class="glow-btn btn-primary px-3 md:px-4 py-1 md:py-2 rounded-full flex items-center text-sm md:text-base" data-modal-target="invite-member-modal"><i class="fas fa-user-plus mr-2"></i> Invite Member</button>
+                                ${hasAdmin ? '<button class="glow-btn btn-primary px-3 md:px-4 py-1 md:py-2 rounded-full flex items-center text-sm md:text-base" data-modal-target="invite-member-modal"><i class="fas fa-user-plus mr-2"></i> Invite Member</button>' : ''}
                             </div>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left">
@@ -1579,8 +1586,8 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="glass-card p-6 rounded-2xl">
-                            <h2 class="text-xl font-bold mb-6 text-center md:text-left">Workspace Permissions</h2>
+                        ${hasAdmin ? `<div class="glass-card p-6 rounded-2xl">
+                            <h2 class="text-xl font-bold mb-6 text-center md:text-left">Workspace Permissions</h2>` : ''}
                             <div class="space-y-4">
                                 <div class="flex justify-between items-center p-3 bg-white/5 rounded-3xl">
                                     <div class="flex-1 pr-4">
@@ -1634,9 +1641,9 @@
                                     <label class="switch"><input type="checkbox" checked disabled><span class="slider"></span></label>
                                 </div>
                             </div>
-                        </div>
-                        <div class="glass-card p-6 rounded-2xl">
-                            <h2 class="text-xl font-bold mb-6 text-center md:text-left">Download Requests</h2>
+                        </div>` : ''}
+                        ${hasAdmin ? `<div class="glass-card p-6 rounded-2xl">
+                            <h2 class="text-xl font-bold mb-6 text-center md:text-left">Download Requests</h2>` : ''}
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left">
                                     <thead>
@@ -1658,7 +1665,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
+                        </div>` : ''}
                     </div>
                 `;
                  document.getElementById('governance-page').innerHTML = `
@@ -4663,6 +4670,22 @@
                 }
             }
 
+            // Helper function to check if current user is owner
+            function isCurrentUserOwner() {
+                const currentUser = JSON.parse(sessionStorage.getItem('stella_user'));
+                if (!currentUser) return false;
+                const currentUserMember = teamMembers.find(member => member.id === currentUser.id);
+                return currentUserMember && currentUserMember.role === 'Owner';
+            }
+
+            // Helper function to check if current user has admin permissions
+            function hasAdminPermissions() {
+                const currentUser = JSON.parse(sessionStorage.getItem('stella_user'));
+                if (!currentUser) return false;
+                const currentUserMember = teamMembers.find(member => member.id === currentUser.id);
+                return currentUserMember && ['Owner', 'Admin'].includes(currentUserMember.role);
+            }
+
             function renderTeamMembers() {
                 const tbody = document.getElementById('team-members-tbody');
                 if(!tbody) return; 
@@ -4672,13 +4695,20 @@
                 
                 if (!currentUser) return;
                 
-                // Owner row with enhanced styling
+                // Find current user's role in the team
+                const currentUserMember = teamMembers.find(member => member.id === currentUser.id);
+                const isOwner = currentUserMember && currentUserMember.role === 'Owner';
+                const userRole = currentUserMember ? currentUserMember.role : 'Team Member';
+                const roleIcon = getRoleIcon(userRole);
+                const roleColor = getRoleColor(userRole);
+                
+                // Current user row with enhanced styling
                 tbody.innerHTML += `
                     <tr class="border-b border-[var(--border-dark)] bg-gradient-to-r from-purple-500/5 to-transparent">
                         <td class="p-4">
                             <div class="flex items-center space-x-3">
-                                <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-crown text-white text-sm"></i>
+                                <div class="w-10 h-10 bg-gradient-to-br ${roleColor} rounded-full flex items-center justify-center">
+                                    <i class="${roleIcon} text-white text-sm"></i>
                                 </div>
                                 <div>
                             <p class="font-medium">${currentUser.full_name} (You)</p>
@@ -4688,18 +4718,18 @@
                         </td>
                         <td class="p-4 hidden sm:table-cell text-[var(--text-secondary)]">${currentUser.email}</td>
                         <td class="p-4">
-                            <span class="status-badge bg-gradient-to-r from-purple-500 to-purple-600 text-white px-3 py-1 rounded-full text-xs font-medium">
-                                <i class="fas fa-crown mr-1"></i>Owner
+                            <span class="status-badge bg-gradient-to-r ${roleColor} text-white px-3 py-1 rounded-full text-xs font-medium">
+                                <i class="${roleIcon} mr-1"></i>${userRole}
                             </span>
                         </td>
                         <td class="p-4 text-right text-[var(--text-secondary)]">
-                            <span class="text-xs">Full Access</span>
+                            <span class="text-xs">${isOwner ? 'Full Access' : 'Limited Access'}</span>
                         </td>
                     </tr>
                 `;
 
-                // Team members with enhanced styling
-                teamMembers.forEach(member => {
+                // Team members with enhanced styling (exclude owner)
+                teamMembers.filter(member => member.id !== currentUser.id).forEach(member => {
                     const roleIcon = getRoleIcon(member.role);
                     const roleColor = getRoleColor(member.role);
                     const lastActive = member.last_active ? formatLastActive(member.last_active) : 'Recently';
@@ -4724,20 +4754,23 @@
                                 </span>
                             </td>
                             <td class="p-4 text-right space-x-2 whitespace-nowrap">
+                                ${hasAdminPermissions() ? `
                                 <button data-id="${member.id}" class="edit-member-btn text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 px-3 py-1 rounded-md transition-colors text-sm">
                                     <i class="fas fa-edit mr-1"></i>Edit
                                 </button>
                                 <button data-id="${member.id}" class="remove-member-btn text-red-400 hover:text-red-300 hover:bg-red-500/10 px-3 py-1 rounded-md transition-colors text-sm">
                                     <i class="fas fa-user-times mr-1"></i>Remove
                                 </button>
+                                ` : '<span class="text-xs text-[var(--text-secondary)]">View Only</span>'}
                             </td>
                         </tr>
                     `;
                     tbody.innerHTML += row;
                 });
                 
-                // Pending invites with enhanced styling
-                pendingInvites.forEach(invite => {
+                // Pending invites with enhanced styling (only show for admin users)
+                if (hasAdminPermissions()) {
+                    pendingInvites.forEach(invite => {
                     const roleText = invite.role || 'Team Member';
                     const roleIcon = getRoleIcon(roleText);
                     const roleColor = getRoleColor(roleText);
@@ -4764,14 +4797,17 @@
                             </td>
                             <td class="p-4 text-right space-x-2 whitespace-nowrap">
                                 <span class="text-xs text-[var(--text-secondary)] mr-2">Invited ${inviteDate}</span>
+                                ${hasAdminPermissions() ? `
                                 <button data-email="${invite.email}" class="revoke-invite-btn text-red-400 hover:text-red-300 hover:bg-red-500/10 px-3 py-1 rounded-md transition-colors text-sm">
                                     <i class="fas fa-times mr-1"></i>Revoke
                                 </button>
+                                ` : ''}
                             </td>
                         </tr>
                     `;
                     tbody.innerHTML += row;
-                });
+                    });
+                }
             }
 
             // Helper functions for team member rendering
