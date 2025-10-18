@@ -363,3 +363,4 @@ function handleReplyTicket($pdo, $userId, $data) {
         sendJson(['success' => false, 'message' => 'Database error'], 500);
     }
 }
+
