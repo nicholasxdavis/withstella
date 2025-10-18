@@ -9,6 +9,10 @@ set_error_handler(function($errno, $errstr, $errfile, $errline) {
     throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
 });
 
+// Disable display_errors to prevent HTML output
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+
 // Buffer output so we can return clean JSON
 ob_start();
 
@@ -19,6 +23,27 @@ ini_set('session.cookie_samesite', 'Lax');
 session_name('STELLA_SESSION');
 
 header('Content-Type: application/json');
+
+// Check for required files before including them
+$requiredFiles = [
+    __DIR__ . '/../api/auth_helper.php',
+    __DIR__ . '/../app/Models/GovernanceRule.php',
+    __DIR__ . '/../app/Models/Asset.php',
+    __DIR__ . '/../app/Models/BrandKit.php'
+];
+
+foreach ($requiredFiles as $file) {
+    if (!file_exists($file)) {
+        while (ob_get_level()) { ob_end_clean(); }
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Required file not found: ' . basename($file)
+        ]);
+        exit;
+    }
+}
+
 require_once __DIR__ . '/../api/auth_helper.php';
 require_once __DIR__ . '/../app/Models/GovernanceRule.php';
 require_once __DIR__ . '/../app/Models/Asset.php';

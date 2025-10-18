@@ -562,6 +562,9 @@
                         <button onclick="testAdminDebug()" class="btn-warning w-full mb-2 text-sm">
                             <i class="fas fa-bug"></i> Test: Admin Debug (Detailed)
                         </button>
+                        <button onclick="testSimpleAPI()" class="btn-primary w-full mb-2 text-sm">
+                            <i class="fas fa-flask"></i> Test: Simple API Endpoint
+                        </button>
                         <button onclick="runQuickTest()" class="btn-primary w-full mb-2">
                             <i class="fas fa-play"></i> Run Quick Test
                         </button>
@@ -604,10 +607,16 @@
                             </div>
                             <div class="space-y-2">
                                 <button onclick="simulateAPI('validate')" class="btn-primary w-full text-sm">
-                                    <i class="fas fa-check-circle"></i> Test Validation
+                                    <i class="fas fa-check-circle"></i> Test Validation (API Key)
                                 </button>
                                 <button onclick="simulateAPI('store')" class="btn-warning w-full text-sm">
-                                    <i class="fas fa-save"></i> Test Store Content
+                                    <i class="fas fa-save"></i> Test Store Content (API Key)
+                                </button>
+                                <button onclick="simulateAPISession('validate')" class="btn-primary w-full text-sm">
+                                    <i class="fas fa-user-check"></i> Test Validation (Session)
+                                </button>
+                                <button onclick="simulateAPISession('store')" class="btn-warning w-full text-sm">
+                                    <i class="fas fa-user-save"></i> Test Store Content (Session)
                                 </button>
                                 <button onclick="loadTestCases()" class="btn-primary w-full text-sm">
                                     <i class="fas fa-list"></i> Load Test Cases
@@ -623,6 +632,10 @@
                         <i class="fas fa-chart-line text-primary"></i> API Simulation Results
                     </h3>
                     <div id="api-sim-results" class="space-y-4">
+                        <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 mb-4">
+                            <i class="fas fa-info-circle text-yellow-500"></i>
+                            <strong class="text-yellow-500">Note:</strong> If you see a "passkey_main.out.js" error in the console, this is likely from a browser extension or developer tools and is not related to this application.
+                        </div>
                         <p class="text-gray-500 text-center py-8">
                             <i class="fas fa-info-circle"></i> Click "Test Validation" to see results
                         </p>
@@ -1587,6 +1600,45 @@
             }
         }
 
+        // Test 5: Simple API Endpoint
+        async function testSimpleAPI() {
+            const resultsEl = document.getElementById('quick-test-results');
+            resultsEl.innerHTML = '<p class="text-yellow-400">Testing simple API endpoint...</p>';
+            log('═══════════════════════════════════════', 'info');
+            log('TEST 5: Simple API Endpoint', 'info');
+            
+            try {
+                const response = await fetch('/api/test_simple.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-ID': '1',
+                        'X-User-Email': 'test@example.com'
+                    },
+                    body: JSON.stringify({ test: 'data' })
+                });
+                
+                const text = await response.text();
+                log(`Response status: ${response.status}`, 'info');
+                log(`Response text: ${text}`, 'info');
+                
+                const data = JSON.parse(text);
+                
+                if (data.success) {
+                    resultsEl.innerHTML = `<div class="p-2 bg-green-500/20 rounded">✓ Simple API Working<br>
+                        <span class="text-xs">Method: ${data.method}, Timestamp: ${data.timestamp}</span></div>`;
+                    log('✓ Simple API test passed', 'success');
+                    log(`  Method: ${data.method}`, 'success');
+                    log(`  Headers received: ${JSON.stringify(data.headers)}`, 'success');
+                } else {
+                    throw new Error('API returned success: false');
+                }
+            } catch (error) {
+                resultsEl.innerHTML = `<div class="p-2 bg-red-500/20 rounded">✗ Failed: ${error.message}</div>`;
+                log('✗ Simple API test failed: ' + error.message, 'error');
+            }
+        }
+
         // Comprehensive diagnostic test
         async function runDiagnosticTest() {
             const resultsEl = document.getElementById('quick-test-results');
@@ -1752,17 +1804,121 @@
                     return;
                 }
 
+                // Get current user for fallback authentication
+                const currentUser = JSON.parse(sessionStorage.getItem('stella_user') || '{}');
+                
                 const response = await fetch(url, {
                     method: method,
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${apiKey}`,
-                        'X-API-Key': apiKey
+                        'X-API-Key': apiKey,
+                        // Add fallback headers for dashboard authentication
+                        'X-User-ID': currentUser.id || '',
+                        'X-User-Email': currentUser.email || ''
                     },
                     body: body
                 });
 
-                const data = await response.json();
+                // Get response text first to check if it's valid JSON
+                const responseText = await response.text();
+                console.log('API Response:', responseText);
+                
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('JSON Parse Error:', parseError);
+                    console.error('Response was not valid JSON:', responseText);
+                    
+                    // Check if response contains HTML error messages
+                    if (responseText.includes('<br />') || responseText.includes('<b>')) {
+                        showApiSimResult(`Server returned HTML error instead of JSON. This usually indicates a PHP error. Check server logs. Response: ${responseText.substring(0, 200)}...`, 'error');
+                    } else {
+                        showApiSimResult(`Server returned invalid JSON: ${responseText.substring(0, 200)}...`, 'error');
+                    }
+                    return;
+                }
+                
+                if (data.success) {
+                    displayApiSimResults(data, content, action);
+                } else {
+                    showApiSimResult(`API Error: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                console.error('API Simulation failed:', error);
+                showApiSimResult(`Request failed: ${error.message}`, 'error');
+            }
+        }
+
+        // API Simulation using Session Authentication (no API key required)
+        async function simulateAPISession(action) {
+            const content = document.getElementById('sim-content').value.trim();
+            
+            if (!content) {
+                showApiSimResult('Please enter content to test', 'error');
+                return;
+            }
+
+            showApiSimResult('Testing API with session authentication...', 'info');
+
+            try {
+                // Get current user session
+                const currentUser = JSON.parse(sessionStorage.getItem('stella_user') || '{}');
+                
+                if (!currentUser.id) {
+                    showApiSimResult('No user session found. Please log in first.', 'error');
+                    return;
+                }
+
+                let url, method, body;
+                
+                if (action === 'validate') {
+                    url = '/api/api_content.php?action=validate';
+                    method = 'POST';
+                    body = JSON.stringify({ content: content });
+                } else if (action === 'store') {
+                    url = '/api/api_content.php?action=validate-and-store';
+                    method = 'POST';
+                    body = JSON.stringify({ 
+                        content: content,
+                        name: 'API Test Content',
+                        description: 'Content created via API simulation'
+                    });
+                } else {
+                    showApiSimResult('Invalid action', 'error');
+                    return;
+                }
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-ID': currentUser.id,
+                        'X-User-Email': currentUser.email
+                    },
+                    body: body
+                });
+
+                // Get response text first to check if it's valid JSON
+                const responseText = await response.text();
+                console.log('API Response (Session):', responseText);
+                
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('JSON Parse Error:', parseError);
+                    console.error('Response was not valid JSON:', responseText);
+                    
+                    // Check if response contains HTML error messages
+                    if (responseText.includes('<br />') || responseText.includes('<b>')) {
+                        showApiSimResult(`Server returned HTML error instead of JSON. This usually indicates a PHP error. Check server logs. Response: ${responseText.substring(0, 200)}...`, 'error');
+                    } else {
+                        showApiSimResult(`Server returned invalid JSON: ${responseText.substring(0, 200)}...`, 'error');
+                    }
+                    return;
+                }
                 
                 if (data.success) {
                     displayApiSimResults(data, content, action);
