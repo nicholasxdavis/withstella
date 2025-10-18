@@ -1339,6 +1339,9 @@
                     kitCreated: false, assetUploaded: false, teamInvited: false, completed: false, dismissed: false
                 });
 
+                // Load team members from database API to ensure we have the latest data
+                await loadTeamMembersFromAPI();
+
                 // Load assets from database API (syncs across devices)
                 try {
                     const response = await fetch('/api/assets.php?action=list', {
@@ -2161,6 +2164,8 @@
                             loadApiKeys();
                         } else if (pageId === 'analytics') {
                             loadAnalyticsData();
+                        } else if (pageId === 'team-settings') {
+                            loadTeamMembersFromAPI();
                         }
 
                         // Close mobile sidebar on navigation
@@ -4588,6 +4593,41 @@
 
 
             // --- TEAM MANAGEMENT ---
+            async function loadTeamMembersFromAPI() {
+                try {
+                    const currentUser = JSON.parse(sessionStorage.getItem('stella_user'));
+                    if (!currentUser) return;
+
+                    const response = await fetch('/api/team.php?action=list-members', {
+                        headers: getAuthHeaders()
+                    });
+                    const data = await response.json();
+
+                    if (data.success && data.members) {
+                        // Update team members with data from API
+                        teamMembers = data.members.map(member => ({
+                            id: member.id,
+                            name: member.full_name,
+                            email: member.email,
+                            role: member.team_role || member.role,
+                            status: member.team_status || 'active',
+                            last_active: member.last_active,
+                            created_at: member.created_at,
+                            updated_at: member.updated_at
+                        }));
+
+                        // Save to local storage for offline access
+                        ls.set(getUserDataKey('stella_teamMembers'), teamMembers);
+
+                        // Update UI
+                        renderTeamMembers();
+                        renderTeamOverview();
+                    }
+                } catch (error) {
+                    console.error('Error loading team members from API:', error);
+                }
+            }
+
             function renderTeamMembers() {
                 const tbody = document.getElementById('team-members-tbody');
                 if(!tbody) return; 

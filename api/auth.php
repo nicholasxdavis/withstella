@@ -410,7 +410,7 @@ function handleAcceptInvite($pdo, $data) {
                 role,
                 created_at,
                 updated_at
-            ) VALUES (?, ?, ?, ?, 'member', NOW(), NOW())
+            ) VALUES (?, ?, ?, ?, 'team_member', NOW(), NOW())
         ");
         $stmt->execute([
             $full_name,
