@@ -8,7 +8,30 @@
     <link rel="icon" href="https://placehold.co/32x32/9c7ead/FFFFFF?text=S" type="image/png">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://assets.vercel.com/raw/upload/v1587415301/fonts/2/Geist.css">
+    <!-- Geist font loaded locally -->
+    <style>
+        @font-face {
+            font-family: 'Geist';
+            src: url('../ui/fonts/Geist-Regular.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Geist';
+            src: url('../ui/fonts/Geist-Medium.ttf') format('truetype');
+            font-weight: 500;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Geist';
+            src: url('../ui/fonts/Geist-Bold.ttf') format('truetype');
+            font-weight: 700;
+            font-style: normal;
+        }
+        body {
+            font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+    </style>
     <script>
         // Tailwind Play CDN hotfix for dynamic, JS-injected HTML
         // Safelist the utilities we use so CSS is generated before content injection
@@ -39,6 +62,7 @@
             ]
         };
     </script>
+    <!-- Note: Using Tailwind CDN for development. For production, install Tailwind CSS locally -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     
@@ -1590,7 +1614,7 @@
                      teamSettingsContent += `
                         <div class="glass-card p-6 rounded-2xl">
                             <h2 class="text-xl font-bold mb-6 text-center md:text-left">Workspace Permissions</h2>
-                            <div class="space-y-4">`;
+                            <div class="space-y-4">
                                 <div class="flex justify-between items-center p-3 bg-white/5 rounded-3xl">
                                     <div class="flex-1 pr-4">
                                         <p class="font-medium">Team Members Can Upload</p>
@@ -4617,9 +4641,15 @@
                     const response = await fetch('/api/team.php?action=list-members', {
                         headers: getAuthHeaders()
                     });
+                    
+                    if (!response.ok) {
+                        console.error('Failed to load team members:', response.status, response.statusText);
+                        return;
+                    }
+                    
                     const data = await response.json();
 
-                    if (data.success && data.members) {
+                    if (data && data.success && data.members) {
                         // Update team members with data from API
                         teamMembers = data.members.map(member => ({
                             id: member.id,
@@ -4652,9 +4682,15 @@
                     const response = await fetch('/api/team.php?action=list-pending-invites', {
                         headers: getAuthHeaders()
                     });
+                    
+                    if (!response.ok) {
+                        console.error('Failed to load pending invites:', response.status, response.statusText);
+                        return;
+                    }
+                    
                     const data = await response.json();
 
-                    if (data.success && data.invites) {
+                    if (data && data.success && data.invites) {
                         // Update pending invites with data from API
                         pendingInvites = data.invites.map(invite => ({
                             id: invite.id,
