@@ -846,7 +846,7 @@
                 </form>
             </div>
             <div class="modal-footer justify-between">
-                <button id="delete-kit-btn" class="glow-btn px-4 py-2 rounded-full text-red-500 hover:bg-red-500/10">Delete Kit</button>
+                <button id="delete-kit-btn" class="glow-btn px-4 py-2 rounded-full text-[#9c7ead] hover:text-red-500 hover:bg-red-500/10">Delete Kit</button>
                 <div>
                     <button class="glow-btn btn-secondary px-4 py-2 rounded-full modal-close">Cancel</button>
                     <button id="save-kit-changes-btn" class="glow-btn btn-primary px-4 py-2 rounded-full">Save Changes</button>
@@ -1407,6 +1407,9 @@
                     kitCreated: false, assetUploaded: false, teamInvited: false, completed: false, dismissed: false
                 });
 
+                // Load activities from API
+                loadActivitiesFromAPI();
+
                 // Load team members and pending invites from database API to ensure we have the latest data
                 await loadTeamMembersFromAPI();
                 await loadPendingInvitesFromAPI();
@@ -1920,7 +1923,7 @@
                                 <div class="p-4 bg-white/5 rounded-xl border border-[var(--border-dark)]">
                                     <div class="flex items-start justify-between mb-2">
                                         <h3 class="font-semibold text-lg">Validate Content</h3>
-                                        <span class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs font-semibold">POST</span>
+                                        <span class="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-xs font-semibold">POST</span>
                                 </div>
                                     <div class="bg-black/50 p-2 rounded mb-3 flex items-center justify-between">
                                         <code class="text-sm text-green-400">${window.location.origin}/api/api_content.php?action=validate</code>
@@ -2007,14 +2010,14 @@
                                 <div class="p-4 bg-white/5 rounded-xl border border-[var(--border-dark)]">
                                     <div class="flex items-start justify-between mb-2">
                                         <h3 class="font-semibold">List Rules</h3>
-                                        <span class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs font-semibold">GET</span>
+                                        <span class="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-xs font-semibold">GET</span>
                                     </div>
                                     <code class="text-sm text-[var(--text-secondary)]">/api/governance.php?path=list</code>
                                 </div>
                                 <div class="p-4 bg-white/5 rounded-xl border border-[var(--border-dark)]">
                                     <div class="flex items-start justify-between mb-2">
                                         <h3 class="font-semibold">Update/Delete Rule</h3>
-                                        <span class="px-3 py-1 bg-orange-500/20 text-orange-400 rounded-full text-xs font-semibold">PUT/DELETE</span>
+                                        <span class="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-xs font-semibold">PUT/DELETE</span>
                                         </div>
                                     <code class="text-sm text-[var(--text-secondary)]">/api/governance.php?id={rule_id}</code>
                                         </div>
@@ -2765,7 +2768,7 @@
                                                 <input type="checkbox" ${rule.enabled ? 'checked' : ''} onchange="toggleRule(${rule.id}, this.checked)">
                                                 <span class="slider"></span>
                                             </label>
-                                            <button onclick="deleteRule(${rule.id})" class="text-red-500 hover:text-red-400 px-2">
+                                            <button onclick="deleteRule(${rule.id})" class="text-[#9c7ead] hover:text-red-500 px-2">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </div>
@@ -2873,7 +2876,7 @@
                                                 ${key.last_used_at ? 'Last used ' + new Date(key.last_used_at).toLocaleString() : 'Never used'}
                                             </p>
                                         </div>
-                                        <button onclick="deleteApiKey(${key.id})" class="text-red-500 hover:text-red-400 px-2">
+                                        <button onclick="deleteApiKey(${key.id})" class="text-[#9c7ead] hover:text-red-500 px-2">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </div>
@@ -2929,12 +2932,19 @@
                         days = 14; // Default to 14 days if invalid
                     }
                     
-                    // Fetch real analytics
+                    // Fetch activities data for team activity graph
+                    const activitiesRes = await fetch(`/api/activities.php?action=stats&days=${days}`, {
+                        headers: { 'X-User-ID': currentUser.id, 'X-User-Email': currentUser.email }
+                    });
+                    const activitiesData = await activitiesRes.json();
+                    
+                    // Fetch analytics events data
                     const res = await fetch(`/api/analytics.php?action=stats&days=${days}`, {
                         headers: { 'X-User-ID': currentUser.id, 'X-User-Email': currentUser.email }
                     });
                     const api = await res.json();
                     const totalEvents = api?.stats?.total_events ?? 0;
+                    const totalActivities = activitiesData?.stats?.total_activities ?? 0;
                     
                     // Update stat elements if they exist
                     const totalMembersEl = document.getElementById('stat-total-members');
@@ -3001,13 +3011,14 @@
                     // Create activity chart using Chart.js
                     const chartCanvas = document.getElementById('activity-chart');
                     if (chartCanvas && typeof Chart !== 'undefined') {
-                        const byDay = Array.isArray(api?.stats?.by_day) ? api.stats.by_day : [];
-                        // Aggregate into the last N calendar days, fill gaps with 0 to mirror "Recent Activity per day"
+                        // Use activities data for team activity graph
+                        const byDay = Array.isArray(activitiesData?.stats?.by_day) ? activitiesData.stats.by_day : [];
+                        // Aggregate into the last N calendar days, fill gaps with 0
                         const map = new Map();
                         byDay.forEach(d => { map.set(d.date, Number(d.count) || 0); });
                         const labels = [];
                         const data = [];
-                        for (let i = 13; i >= 0; i--) {
+                        for (let i = days - 1; i >= 0; i--) {
                             const dt = new Date(); dt.setDate(dt.getDate() - i);
                             const key = dt.toISOString().slice(0,10);
                             labels.push(dt.toLocaleDateString());
@@ -3057,6 +3068,12 @@
                                 }
                             }
                         });
+                        
+                        // Update chart status
+                        const statusEl = document.getElementById('activity-chart-status');
+                        if (statusEl) {
+                            statusEl.textContent = `Showing ${totalActivities} team activities over the last ${days} days`;
+                        }
                     }
                     
                 } catch (error) {
@@ -3306,7 +3323,7 @@
                             <div class="card-menu w-36 bg-[var(--card-dark)] border border-[var(--border-dark)] rounded-md shadow-lg">
                                 <button class="share-kit-btn block w-full text-left px-3 py-2 text-sm hover:bg-white/5"><i class="fas fa-share-alt mr-2"></i>Share</button>
                                 <button class="edit-kit-btn block w-full text-left px-3 py-2 text-sm hover:bg-white/5"><i class="fas fa-edit mr-2"></i>Edit</button>
-                                <button class="delete-kit-btn-from-menu block w-full text-left px-3 py-2 text-sm text-red-500 hover:bg-white/5"><i class="fas fa-trash mr-2"></i>Delete</button>
+                                <button class="delete-kit-btn-from-menu block w-full text-left px-3 py-2 text-sm text-[#9c7ead] hover:text-red-500 hover:bg-white/5"><i class="fas fa-trash mr-2"></i>Delete</button>
                             </div>
                         </div>
                     `;
@@ -3481,6 +3498,9 @@
                                     // User can download directly
                         const downloadUrl = `/api/image_proxy.php?id=${assetId}&download=true`;
                         
+                        // Track activity
+                        trackActivity('download', `Downloaded asset: ${assetName}`, { asset_id: assetId, asset_name: assetName });
+                        
                         fetch(downloadUrl, {
                             headers: getAuthHeaders()
                         })
@@ -3645,7 +3665,7 @@
                                         <button data-id="${asset.id}" data-name="${asset.name}" class="kit-asset-share-btn block w-full text-left px-3 py-2 text-sm hover:bg-white/5"><i class="fas fa-share-alt mr-2"></i>Share</button>
                                         <button data-id="${asset.id}" data-name="${asset.name}" class="asset-download-btn block w-full text-left px-3 py-2 text-sm hover:bg-white/5"><i class="fas fa-download mr-2"></i>Download</button>
                                         <button data-url="${shareLink}" class="asset-copy-btn block w-full text-left px-3 py-2 text-sm hover:bg-white/5"><i class="fas fa-copy mr-2"></i>Copy URL</button>
-                                        <button data-id="${asset.id}" data-kit-id="${kitId}" class="kit-asset-remove-btn block w-full text-left px-3 py-2 text-sm text-red-500 hover:bg-white/5"><i class="fas fa-trash mr-2"></i>Remove from Kit</button>
+                                        <button data-id="${asset.id}" data-kit-id="${kitId}" class="kit-asset-remove-btn block w-full text-left px-3 py-2 text-sm text-[#9c7ead] hover:text-red-500 hover:bg-white/5"><i class="fas fa-trash mr-2"></i>Remove from Kit</button>
                                     </div>
                                 </div>
                             </div>
@@ -3842,7 +3862,7 @@
                                         <button data-id="${asset.id}" data-name="${asset.name}" class="asset-share-btn block w-full text-left px-3 py-2 text-sm hover:bg-white/5"><i class="fas fa-share-alt mr-2"></i>Share</button>
                                         <button data-id="${asset.id}" data-name="${asset.name}" class="asset-download-btn block w-full text-left px-3 py-2 text-sm hover:bg-white/5"><i class="fas fa-download mr-2"></i>Download</button>
                                         <button data-url="${shareLink}" class="asset-copy-btn block w-full text-left px-3 py-2 text-sm hover:bg-white/5"><i class="fas fa-copy mr-2"></i>Copy URL</button>
-                                        <button data-id="${asset.id}" class="asset-delete-btn block w-full text-left px-3 py-2 text-sm text-red-500 hover:bg-white/5"><i class="fas fa-trash mr-2"></i>Delete</button>
+                                        <button data-id="${asset.id}" class="asset-delete-btn block w-full text-left px-3 py-2 text-sm text-[#9c7ead] hover:text-red-500 hover:bg-white/5"><i class="fas fa-trash mr-2"></i>Delete</button>
                                     </div>
                                 </div>
                             </div>
@@ -3880,6 +3900,9 @@
                                 if (data.can_download) {
                                     // User can download directly
                         const downloadUrl = `/api/image_proxy.php?id=${assetId}&download=true`;
+                        
+                        // Track activity
+                        trackActivity('download', `Downloaded asset: ${assetName}`, { asset_id: assetId, asset_name: assetName });
                         
                         fetch(downloadUrl, {
                             headers: getAuthHeaders()
@@ -3969,6 +3992,10 @@
                         if (navigator.clipboard && navigator.clipboard.writeText) {
                             navigator.clipboard.writeText(url).then(() => {
                                 showToast('URL copied to clipboard!', 'success');
+                                
+                                // Track activity
+                                const assetName = copyBtn.closest('.asset-card')?.querySelector('.asset-name')?.textContent || 'Unknown asset';
+                                trackActivity('copy', `Copied URL for asset: ${assetName}`, { asset_name: assetName, url: url });
                             }).catch((err) => {
                                 console.error('Clipboard API failed:', err);
                                 fallbackCopyToClipboard(url);
@@ -4511,6 +4538,15 @@
                         linkInput.select();
                         navigator.clipboard.writeText(linkInput.value).then(() => {
                             showToast('Share link copied to clipboard!', 'success');
+                            
+                            // Track activity
+                            const shareType = currentShareData.type === 'brand-kit' ? 'brand kit' : 'asset';
+                            trackActivity('share', `Copied share link for ${shareType}: ${currentShareData.name}`, { 
+                                type: currentShareData.type, 
+                                name: currentShareData.name, 
+                                id: currentShareData.id 
+                            });
+                            
                             copyLinkBtn.innerHTML = '<i class="fas fa-check"></i>';
                             setTimeout(() => {
                                 copyLinkBtn.innerHTML = '<i class="fas fa-copy"></i>';
@@ -4585,7 +4621,7 @@
                                     <p class="text-xs text-[var(--text-secondary)]">${item.permission === 'view' ? 'Can View' : 'Can Edit'}</p>
                                 </div>
                             </div>
-                            <button class="remove-collaborator-btn text-red-500 hover:text-red-400 text-sm" data-email="${item.email}">
+                            <button class="remove-collaborator-btn text-[#9c7ead] hover:text-red-500 text-sm" data-email="${item.email}">
                                 <i class="fas fa-times"></i>
                             </button>
                         </div>
@@ -4853,7 +4889,7 @@
                                 <button data-id="${member.id}" class="edit-member-btn text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 px-3 py-1 rounded-md transition-colors text-sm">
                                     <i class="fas fa-edit mr-1"></i>Edit
                                 </button>
-                                <button data-id="${member.id}" class="remove-member-btn text-red-400 hover:text-red-300 hover:bg-red-500/10 px-3 py-1 rounded-md transition-colors text-sm">
+                                <button data-id="${member.id}" class="remove-member-btn text-[#9c7ead] hover:text-red-500 hover:bg-red-500/10 px-3 py-1 rounded-md transition-colors text-sm">
                                     <i class="fas fa-user-times mr-1"></i>Remove
                                 </button>
                                 ` : '<span class="text-xs text-[var(--text-secondary)]">View Only</span>'}
@@ -4893,7 +4929,7 @@
                             <td class="p-4 text-right space-x-2 whitespace-nowrap">
                                 <span class="text-xs text-[var(--text-secondary)] mr-2">Invited ${inviteDate}</span>
                                 ${hasAdminPermissions() ? `
-                                <button data-email="${invite.email}" class="revoke-invite-btn text-red-400 hover:text-red-300 hover:bg-red-500/10 px-3 py-1 rounded-md transition-colors text-sm">
+                                <button data-email="${invite.email}" class="revoke-invite-btn text-[#9c7ead] hover:text-red-500 hover:bg-red-500/10 px-3 py-1 rounded-md transition-colors text-sm">
                                     <i class="fas fa-times mr-1"></i>Revoke
                                 </button>
                                 ` : ''}
@@ -5141,7 +5177,7 @@
                                         <button class="approve-request-btn px-3 py-1 bg-green-500/10 text-green-500 border border-green-500/30 rounded-full text-xs hover:bg-green-500/20 transition-colors" data-id="${request.id}">
                                             <i class="fas fa-check mr-1"></i>Approve
                                         </button>
-                                        <button class="deny-request-btn px-3 py-1 bg-red-500/10 text-red-500 border border-red-500/30 rounded-full text-xs hover:bg-red-500/20 transition-colors" data-id="${request.id}">
+                                        <button class="deny-request-btn px-3 py-1 bg-[#9c7ead]/10 text-[#9c7ead] border border-[#9c7ead]/30 rounded-full text-xs hover:bg-red-500/20 hover:text-red-500 hover:border-red-500/30 transition-colors" data-id="${request.id}">
                                             <i class="fas fa-times mr-1"></i>Deny
                                         </button>
                                     </div>
@@ -5249,16 +5285,40 @@
                         return;
                     }
 
-                    // Remove from local storage
-                            teamMembers = teamMembers.filter(m => m.id !== memberId);
-                            ls.set(getUserDataKey('stella_teamMembers'), teamMembers);
+                    // Call API to remove member
+                    const response = await fetch('/api/team.php?action=remove-member', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-User-ID': currentUser.id,
+                            'X-User-Email': currentUser.email
+                        },
+                        body: JSON.stringify({
+                            email: member.email
+                        })
+                    });
+
+                    const data = await response.json();
                     
-                    // Update UI
-                            renderTeamMembers();
-                            renderTeamOverview();
-                    
-                    showToast(`${member.name} has been removed from the team`, 'success');
-                    logActivity('fas fa-user-minus', 'Removed team member', `Removed ${member.name} from team`, new Date().toLocaleTimeString());
+                    if (data.success) {
+                        // Remove from local storage
+                        teamMembers = teamMembers.filter(m => m.id !== memberId);
+                        ls.set(getUserDataKey('stella_teamMembers'), teamMembers);
+                        
+                        // Update UI
+                        renderTeamMembers();
+                        renderTeamOverview();
+                        
+                        // Track activity
+                        trackActivity('team', `Removed team member: ${member.name} (${member.email})`, { 
+                            member_id: memberId, 
+                            member_email: member.email 
+                        });
+                        
+                        showToast('Team member removed successfully', 'success');
+                    } else {
+                        showToast(data.message || 'Failed to remove team member', 'error');
+                    }
                 } catch (error) {
                     console.error('Error removing member:', error);
                     showToast('Failed to remove member', 'error');
@@ -5273,10 +5333,16 @@
                 }
 
                 // Populate modal with member data
-                            editModal.querySelector('#edit-member-id').value = member.id;
-                            editModal.querySelector('#edit-member-email').textContent = member.email;
+                editModal.querySelector('#edit-member-id').value = member.id;
+                editModal.querySelector('#edit-member-email').textContent = member.email;
                 editModal.querySelector('#edit-member-name').value = member.name || '';
-                            editModal.querySelector('#edit-member-role').value = member.role;
+                editModal.querySelector('#edit-member-role').value = member.role;
+                
+                // Update role description
+                updateRoleDescription(member.role);
+                
+                // Setup action button handlers
+                setupEditMemberActions(member);
                 
                 // Show role-specific information
                 const roleInfo = editModal.querySelector('#role-info');
@@ -5287,14 +5353,14 @@
                             editModal.classList.add('active');
                         }
 
-            function saveMemberChanges() {
+            async function saveMemberChanges() {
                 const editModal = document.getElementById('edit-member-modal');
                 if (!editModal) return;
 
-                    const memberId = parseInt(editModal.querySelector('#edit-member-id').value);
-                    const newRole = editModal.querySelector('#edit-member-role').value;
+                const memberId = parseInt(editModal.querySelector('#edit-member-id').value);
+                const newRole = editModal.querySelector('#edit-member-role').value;
                 const newName = editModal.querySelector('#edit-member-name').value.trim();
-                    const memberIndex = teamMembers.findIndex(m => m.id === memberId);
+                const memberIndex = teamMembers.findIndex(m => m.id === memberId);
 
                 if (memberIndex === -1) {
                     showToast('Member not found', 'error');
@@ -5312,29 +5378,74 @@
                     }
                 }
 
-                // Update member data
-                        teamMembers[memberIndex].role = newRole;
-                if (newName && newName !== oldName) {
-                    teamMembers[memberIndex].name = newName;
-                }
-                teamMembers[memberIndex].updated_at = new Date().toISOString();
+                try {
+                    const currentUser = JSON.parse(sessionStorage.getItem('stella_user'));
+                    if (!currentUser) {
+                        showToast('Please log in to perform this action', 'error');
+                        return;
+                    }
 
-                // Save to local storage
-                        ls.set(getUserDataKey('stella_teamMembers'), teamMembers);
-                
-                // Update UI
-                        renderTeamMembers();
-                        editModal.classList.remove('active');
-                
-                // Show success message
-                let message = 'Member updated successfully';
-                if (newRole !== oldRole) {
-                    message = `${member.name}'s role changed from ${oldRole} to ${newRole}`;
+                    // Call API to update role if changed
+                    if (newRole !== oldRole) {
+                        const response = await fetch('/api/team.php?action=update-role', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-User-ID': currentUser.id,
+                                'X-User-Email': currentUser.email
+                            },
+                            body: JSON.stringify({
+                                email: member.email,
+                                role: newRole
+                            })
+                        });
+
+                        const data = await response.json();
+                        if (!data.success) {
+                            showToast(data.message || 'Failed to update role', 'error');
+                            return;
+                        }
+                    }
+
+                    // Update member data locally
+                    teamMembers[memberIndex].role = newRole;
+                    if (newName && newName !== oldName) {
+                        teamMembers[memberIndex].name = newName;
+                    }
+                    teamMembers[memberIndex].updated_at = new Date().toISOString();
+
+                    // Save to local storage
+                    ls.set(getUserDataKey('stella_teamMembers'), teamMembers);
+                    
+                    // Update UI
+                    renderTeamMembers();
+                    editModal.classList.remove('active');
+                    
+                    // Show success message
+                    let message = 'Member updated successfully';
+                    if (newRole !== oldRole) {
+                        message = `${member.name}'s role changed from ${oldRole} to ${newRole}`;
+                    }
+                    showToast(message, 'success');
+                    
+                    // Track activity
+                    trackActivity('team', `Updated team member: ${member.name} - Role: ${oldRole} → ${newRole}`, { 
+                        member_id: memberId, 
+                        member_email: member.email,
+                        old_role: oldRole,
+                        new_role: newRole
+                    });
+                } catch (error) {
+                    console.error('Error updating member:', error);
+                    showToast('Failed to update member', 'error');
                 }
-                showToast(message, 'success');
-                
-                // Log activity
-                logActivity('fas fa-user-edit', 'Updated team member', message, new Date().toLocaleTimeString());
+            }
+
+            function updateRoleDescription(role) {
+                const roleInfo = document.getElementById('role-info');
+                if (roleInfo) {
+                    roleInfo.innerHTML = getRoleDescription(role);
+                }
             }
 
             function getRoleDescription(role) {
@@ -5347,6 +5458,97 @@
                 return descriptions[role] || 'Role description not available';
             }
 
+            function setupEditMemberActions(member) {
+                // Ban IP Address button
+                const banIpBtn = document.getElementById('ban-ip-btn');
+                if (banIpBtn) {
+                    banIpBtn.onclick = () => banMemberIP(member);
+                }
+
+                // Reset Password button
+                const resetPasswordBtn = document.getElementById('reset-password-btn');
+                if (resetPasswordBtn) {
+                    resetPasswordBtn.onclick = () => resetMemberPassword(member);
+                }
+
+                // View Activity button
+                const viewActivityBtn = document.getElementById('view-activity-btn');
+                if (viewActivityBtn) {
+                    viewActivityBtn.onclick = () => viewMemberActivity(member);
+                }
+
+                // Role change handler
+                const roleSelect = document.getElementById('edit-member-role');
+                if (roleSelect) {
+                    roleSelect.onchange = (e) => updateRoleDescription(e.target.value);
+                }
+            }
+
+            function banMemberIP(member) {
+                showConfirmationModal(
+                    'Ban IP Address',
+                    `Are you sure you want to ban the IP address for <strong>${member.name}</strong>?<br><br>This will prevent them from accessing the platform from their current IP address.`,
+                    () => {
+                        // TODO: Implement IP banning functionality
+                        showToast('IP banning functionality not yet implemented', 'info');
+                    }
+                );
+            }
+
+            function resetMemberPassword(member) {
+                showConfirmationModal(
+                    'Reset Password',
+                    `Are you sure you want to reset the password for <strong>${member.name}</strong>?<br><br>They will receive an email with instructions to set a new password.`,
+                    () => {
+                        // TODO: Implement password reset functionality
+                        showToast('Password reset functionality not yet implemented', 'info');
+                    }
+                );
+            }
+
+            function viewMemberActivity(member) {
+                // Filter activities for this member
+                const memberActivities = activities.filter(activity => 
+                    activity.user_email === member.email || 
+                    activity.user_id === member.id
+                );
+
+                if (memberActivities.length === 0) {
+                    showToast('No activity found for this member', 'info');
+                    return;
+                }
+
+                // Create activity modal content
+                let activityHtml = `
+                    <div class="space-y-3 max-h-96 overflow-y-auto">
+                        <h4 class="font-medium text-white mb-3">Activity for ${member.name}</h4>
+                `;
+
+                memberActivities.slice(0, 10).forEach(activity => {
+                    activityHtml += `
+                        <div class="bg-white/5 rounded-lg p-3 border border-white/10">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <i class="${activity.icon} text-[#9c7ead]"></i>
+                                    <span class="text-sm text-white">${activity.action}</span>
+                                </div>
+                                <span class="text-xs text-[var(--text-secondary)]">${activity.time}</span>
+                            </div>
+                            <p class="text-xs text-[var(--text-secondary)] mt-1">${activity.description}</p>
+                        </div>
+                    `;
+                });
+
+                activityHtml += '</div>';
+
+                showConfirmationModal(
+                    'Member Activity',
+                    activityHtml,
+                    null,
+                    'Close'
+                );
+            }
+
             // --- DASHBOARD DATA ---
             function logActivity(icon, message, detail, time) {
                 activities.unshift({ icon, message, detail, time });
@@ -5355,6 +5557,80 @@
                 }
                 ls.set(getUserDataKey('stella_activities'), activities);
                 renderActivities();
+            }
+
+            // Track activity to database
+            async function trackActivity(type, description, metadata = {}) {
+                try {
+                    const currentUser = JSON.parse(sessionStorage.getItem('stella_user'));
+                    if (!currentUser) return;
+
+                    await fetch('/api/activities.php?action=track', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-User-ID': currentUser.id,
+                            'X-User-Email': currentUser.email
+                        },
+                        body: JSON.stringify({
+                            type: type,
+                            description: description,
+                            metadata: metadata
+                        })
+                    });
+                } catch (error) {
+                    console.error('Failed to track activity:', error);
+                }
+            }
+
+            // Load activities from API
+            async function loadActivitiesFromAPI() {
+                try {
+                    const currentUser = JSON.parse(sessionStorage.getItem('stella_user'));
+                    if (!currentUser) return;
+
+                    const response = await fetch('/api/activities.php?action=list&limit=20', {
+                        headers: {
+                            'X-User-ID': currentUser.id,
+                            'X-User-Email': currentUser.email
+                        }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success) {
+                            // Convert API activities to local format
+                            activities = data.activities.map(activity => ({
+                                icon: getActivityIcon(activity.type),
+                                message: activity.description,
+                                detail: `${activity.user_name} • ${activity.time_ago}`,
+                                time: activity.time_ago
+                            }));
+                            
+                            ls.set(getUserDataKey('stella_activities'), activities);
+                            renderActivities();
+                        }
+                    }
+                } catch (error) {
+                    console.error('Failed to load activities:', error);
+                }
+            }
+
+            // Get icon for activity type
+            function getActivityIcon(type) {
+                const icons = {
+                    'download': 'fa-download',
+                    'share': 'fa-share-alt',
+                    'copy': 'fa-copy',
+                    'upload': 'fa-upload',
+                    'create': 'fa-plus',
+                    'delete': 'fa-trash',
+                    'edit': 'fa-edit',
+                    'view': 'fa-eye',
+                    'team': 'fa-users',
+                    'general': 'fa-circle'
+                };
+                return icons[type] || 'fa-circle';
             }
 
             function renderActivities() {
