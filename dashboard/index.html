@@ -1249,6 +1249,21 @@
                 if (teamSettingsNavMobile) {
                     teamSettingsNavMobile.style.display = hasAdmin ? 'flex' : 'none';
                 }
+                
+                // Update team settings page admin sections
+                const inviteMemberBtn = document.getElementById('invite-member-btn');
+                const workspacePermissionsSection = document.getElementById('workspace-permissions-section');
+                const downloadRequestsSection = document.getElementById('download-requests-section');
+                
+                if (inviteMemberBtn) {
+                    inviteMemberBtn.style.display = hasAdmin ? 'flex' : 'none';
+                }
+                if (workspacePermissionsSection) {
+                    workspacePermissionsSection.style.display = hasAdmin ? 'block' : 'none';
+                }
+                if (downloadRequestsSection) {
+                    downloadRequestsSection.style.display = hasAdmin ? 'block' : 'none';
+                }
             }
 
             function getUserDataKey(baseKey) {
@@ -1604,15 +1619,14 @@
                          </div>
                     </div>
                 `;
-                 // Build team settings page content based on user permissions
-                 const hasAdmin = hasAdminPermissions();
-                 let teamSettingsContent = `
+                 // Initialize team settings page with basic content
+                 document.getElementById('team-settings-page').innerHTML = `
                     <h1 class="text-2xl font-bold mb-6 text-gray-900 text-center md:text-left">Settings</h1>
                     <div class="space-y-6">
                         <div class="glass-card p-6 rounded-2xl">
                             <div class="flex flex-col md:flex-row justify-between items-center mb-6">
                                 <h2 class="text-xl font-bold mb-4 md:mb-0 text-center md:text-left">Manage Members</h2>
-                                ${hasAdmin ? '<button class="glow-btn btn-primary px-3 md:px-4 py-1 md:py-2 rounded-full flex items-center text-sm md:text-base" data-modal-target="invite-member-modal"><i class="fas fa-user-plus mr-2"></i> Invite Member</button>' : ''}
+                                <button class="glow-btn btn-primary px-3 md:px-4 py-1 md:py-2 rounded-full flex items-center text-sm md:text-base" data-modal-target="invite-member-modal" id="invite-member-btn" style="display: none;"><i class="fas fa-user-plus mr-2"></i> Invite Member</button>
                             </div>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left">
@@ -1621,11 +1635,8 @@
                                         </tbody>
                                 </table>
                             </div>
-                        </div>`;
-                 
-                 if (hasAdmin) {
-                     teamSettingsContent += `
-                        <div class="glass-card p-6 rounded-2xl">
+                        </div>
+                        <div class="glass-card p-6 rounded-2xl" id="workspace-permissions-section" style="display: none;">
                             <h2 class="text-xl font-bold mb-6 text-center md:text-left">Workspace Permissions</h2>
                             <div class="space-y-4">
                                 <div class="flex justify-between items-center p-3 bg-white/5 rounded-3xl">
@@ -1681,7 +1692,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="glass-card p-6 rounded-2xl">
+                        <div class="glass-card p-6 rounded-2xl" id="download-requests-section" style="display: none;">
                             <h2 class="text-xl font-bold mb-6 text-center md:text-left">Download Requests</h2>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left">
@@ -1704,14 +1715,9 @@
                                     </tbody>
                                 </table>
                             </div>
-                        </div>`;
-                 }
-                 
-                 teamSettingsContent += `
+                        </div>
                     </div>
                 `;
-                 
-                 document.getElementById('team-settings-page').innerHTML = teamSettingsContent;
                  document.getElementById('governance-page').innerHTML = `
                     <div class="flex flex-col md:flex-row justify-between items-center mb-6">
                         <div>
@@ -4743,15 +4749,17 @@
                 const currentUser = JSON.parse(sessionStorage.getItem('stella_user'));
                 if (!currentUser) return false;
                 
-                // First, try to find the user in team members
+                // Find the user in team members to get their actual role
                 const currentUserMember = teamMembers.find(member => member.id === currentUser.id);
+                
+                // Only grant admin permissions if user is explicitly marked as Owner or Admin
                 if (currentUserMember && ['Owner', 'Admin'].includes(currentUserMember.role)) {
                     return true;
                 }
                 
-                // If not found in team members, check if user has workspace_owner_id set to their own ID
-                // This indicates they are the workspace owner
-                if (currentUser.workspace_owner_id === currentUser.id || !currentUser.workspace_owner_id) {
+                // If not found in team members, check if user is the workspace owner
+                // Only if they have workspace_owner_id set to their own ID (not null/undefined)
+                if (currentUser.workspace_owner_id && currentUser.workspace_owner_id === currentUser.id) {
                     return true;
                 }
                 
