@@ -85,7 +85,7 @@ try {
             LIMIT ?
         ");
         
-        $stmt->execute([$userId, $userId, $userId, $limit]);
+        $stmt->execute([$userId, $userId, $userId, (int)$limit]);
         $activities = $stmt->fetchAll();
         
         // Format activities for frontend

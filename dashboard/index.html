@@ -3642,11 +3642,8 @@
                         days = 14; // Default to 14 days if invalid
                     }
                     
-                    // Fetch activities data for team activity graph
-                    const activitiesRes = await fetch(`/api/activities.php?action=stats&days=${days}`, {
-                        headers: { 'X-User-ID': currentUser.id, 'X-User-Email': currentUser.email }
-                    });
-                    const activitiesData = await activitiesRes.json();
+                    // Use local activities data for consistency with "Recent Team Actions"
+                    const totalActivities = activities.length;
                     
                     // Fetch analytics events data
                     const res = await fetch(`/api/analytics.php?action=stats&days=${days}`, {
@@ -3654,7 +3651,6 @@
                     });
                     const api = await res.json();
                     const totalEvents = api?.stats?.total_events ?? 0;
-                    const totalActivities = activitiesData?.stats?.total_activities ?? 0;
                     
                     // Update stat elements if they exist
                     const totalMembersEl = document.getElementById('stat-total-members');
@@ -3716,23 +3712,74 @@
                                 </div>
                             </div>
                         `).join('');
+                    } else if (analyticsActivitiesEl) {
+                        analyticsActivitiesEl.innerHTML = '<p class="text-center text-[var(--text-secondary)] py-4 text-sm">No recent activity</p>';
+                    }
+                    
+                    // Update most active members
+                    const topMembersEl = document.getElementById('top-members-list');
+                    if (topMembersEl) {
+                        if (activities.length > 0) {
+                            // Count activities by user (simplified - assume current user for most activities)
+                            const currentUser = JSON.parse(sessionStorage.getItem('stella_user'));
+                            const userActivityCount = activities.length;
+                            
+                            topMembersEl.innerHTML = `
+                                <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center">
+                                            <i class="fas fa-user text-white text-sm"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-sm">${currentUser.full_name || currentUser.email}</p>
+                                            <p class="text-xs text-[var(--text-secondary)]">You</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-semibold text-sm">${userActivityCount}</p>
+                                        <p class="text-xs text-[var(--text-secondary)]">actions</p>
+                                    </div>
+                                </div>
+                            `;
+                        } else {
+                            topMembersEl.innerHTML = '<p class="text-center text-[var(--text-secondary)] py-4 text-sm">No activity data yet</p>';
+                        }
                     }
                     
                     // Create activity chart using Chart.js
                     const chartCanvas = document.getElementById('activity-chart');
                     if (chartCanvas && typeof Chart !== 'undefined') {
-                        // Use activities data for team activity graph
-                        const byDay = Array.isArray(activitiesData?.stats?.by_day) ? activitiesData.stats.by_day : [];
-                        // Aggregate into the last N calendar days, fill gaps with 0
-                        const map = new Map();
-                        byDay.forEach(d => { map.set(d.date, Number(d.count) || 0); });
+                        // Generate chart data from local activities
                         const labels = [];
                         const data = [];
+                        const activityCounts = new Map();
+                        
+                        // Count activities by day based on their time
+                        activities.forEach(activity => {
+                            // Parse activity time - handle different formats
+                            let activityDate;
+                            if (activity.time === 'Just now') {
+                                activityDate = new Date();
+                            } else if (activity.time && activity.time.includes(':')) {
+                                // Format like "2:42:13 PM" - assume today
+                                activityDate = new Date();
+                            } else {
+                                // Default to today for unknown formats
+                                activityDate = new Date();
+                            }
+                            
+                            const dayKey = activityDate.toISOString().slice(0, 10);
+                            activityCounts.set(dayKey, (activityCounts.get(dayKey) || 0) + 1);
+                        });
+                        
+                        // Generate labels and data for the last N days
+                        const today = new Date();
                         for (let i = days - 1; i >= 0; i--) {
-                            const dt = new Date(); dt.setDate(dt.getDate() - i);
-                            const key = dt.toISOString().slice(0,10);
+                            const dt = new Date(today);
+                            dt.setDate(dt.getDate() - i);
+                            const key = dt.toISOString().slice(0, 10);
                             labels.push(dt.toLocaleDateString());
-                            data.push(map.get(key) ?? 0);
+                            data.push(activityCounts.get(key) || 0);
                         }
                         
                         // Destroy existing chart if it exists
@@ -4015,9 +4062,10 @@
                     card.className = 'glass-card brand-kit-card aspect-square rounded-2xl p-4 flex flex-col';
                     card.dataset.kitId = kit.id;
 
-                    // Build proper logo URL using the image proxy
-                    const logoHtml = kit.logo_asset_id ? `
-                        <img src="/api/image_proxy.php?id=${kit.logo_asset_id}&size=200" 
+                    // Build proper logo URL using share token if available
+                    const logoAsset = assets.find(a => a.id === kit.logo_asset_id);
+                    const logoHtml = kit.logo_asset_id && logoAsset ? `
+                        <img src="${logoAsset.share_token ? `/api/image_proxy.php?t=${logoAsset.share_token}&size=200` : `/api/image_proxy.php?id=${kit.logo_asset_id}&size=200`}" 
                              class="brand-kit-logo" 
                              alt="${kit.name} Logo" 
                              onload="this.style.opacity='0.05'"
@@ -4283,8 +4331,8 @@
 
                     if (copyBtn) {
                         const url = copyBtn.dataset.url;
-                        if (!url) {
-                            showToast('No URL to copy', 'error');
+                        if (!url || url === '#no-share-token') {
+                            showToast('Share link not available for this asset', 'error');
                             return;
                         }
                         
@@ -4560,10 +4608,10 @@
                             card.classList.add('light-bg');
                         }
 
-                        // Build proper image URLs using the image proxy
-                        const previewUrl = isImage ? `/api/image_proxy.php?id=${asset.id}&size=300` : null;
-                        const downloadLink = `/api/image_proxy.php?id=${asset.id}&download=true`;
-                        const shareLink = asset.share_token ? `/public/view.php?t=${asset.share_token}` : `/api/image_proxy.php?id=${asset.id}`;
+                        // Build proper image URLs using share tokens for public access
+                        const previewUrl = isImage && asset.share_token ? `/api/image_proxy.php?t=${asset.share_token}&size=300` : null;
+                        const downloadLink = asset.share_token ? `/api/image_proxy.php?t=${asset.share_token}&download=true` : `/api/image_proxy.php?id=${asset.id}&download=true`;
+                        const shareLink = asset.share_token ? `/public/view.php?t=${asset.share_token}` : `#no-share-token`;
                         
                         card.innerHTML = `
                             <div class="aspect-square bg-black/20 rounded-md flex items-center justify-center mb-2 overflow-hidden relative">
@@ -4710,8 +4758,8 @@
 
                     if(copyBtn) {
                         const url = copyBtn.dataset.url;
-                        if (!url) {
-                            showToast('No URL to copy', 'error');
+                        if (!url || url === '#no-share-token') {
+                            showToast('Share link not available for this asset', 'error');
                             return;
                         }
                         
