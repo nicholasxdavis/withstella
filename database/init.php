@@ -232,6 +232,59 @@ $tables = [
             FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE,
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ",
+    
+    'download_requests' => "
+        CREATE TABLE IF NOT EXISTS download_requests (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            asset_id INT NOT NULL,
+            requester_id INT NOT NULL,
+            status ENUM('pending', 'approved', 'denied') DEFAULT 'pending',
+            requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            reviewed_at TIMESTAMP NULL,
+            reviewed_by INT NULL,
+            notes TEXT NULL,
+            INDEX idx_asset_id (asset_id),
+            INDEX idx_requester_id (requester_id),
+            INDEX idx_status (status),
+            INDEX idx_requested_at (requested_at),
+            FOREIGN KEY (asset_id) REFERENCES assets(id) ON DELETE CASCADE,
+            FOREIGN KEY (requester_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (reviewed_by) REFERENCES users(id) ON DELETE SET NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ",
+    
+    'public_shares' => "
+        CREATE TABLE IF NOT EXISTS public_shares (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            asset_id INT NOT NULL,
+            share_token VARCHAR(64) NOT NULL UNIQUE,
+            is_active BOOLEAN DEFAULT TRUE,
+            expires_at TIMESTAMP NULL,
+            download_count INT DEFAULT 0,
+            created_by INT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_asset_id (asset_id),
+            INDEX idx_share_token (share_token),
+            INDEX idx_is_active (is_active),
+            INDEX idx_expires_at (expires_at),
+            FOREIGN KEY (asset_id) REFERENCES assets(id) ON DELETE CASCADE,
+            FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ",
+    
+    'team_permissions' => "
+        CREATE TABLE IF NOT EXISTS team_permissions (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            workspace_owner_id INT NOT NULL,
+            permission_type ENUM('upload_assets', 'create_kits', 'download_assets', 'manage_shares') NOT NULL,
+            allowed_roles JSON NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            INDEX idx_workspace_owner (workspace_owner_id),
+            INDEX idx_permission_type (permission_type),
+            FOREIGN KEY (workspace_owner_id) REFERENCES users(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     "
 ];
 

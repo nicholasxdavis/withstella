@@ -21,6 +21,7 @@ function sendJson($data, $statusCode = 200) {
 // Load Nextcloud Storage Service and Auth Helper
 require_once dirname(__DIR__) . '/app/Services/NextcloudStorage.php';
 require_once __DIR__ . '/auth_helper.php';
+require_once __DIR__ . '/team_permissions.php';
 use App\Services\NextcloudStorage;
 
 // Database connection
@@ -85,6 +86,12 @@ switch ($action) {
 					$asset['share_token'] = $shareToken;
 					$asset['public_url'] = $baseUrl . '/public/view.php?t=' . $shareToken;
 				}
+				
+				// Check download permissions
+				$downloadCheck = checkDownloadPermission($pdo, $userId, $asset['id']);
+				$asset['can_download'] = $downloadCheck['can_download'];
+				$asset['requires_approval'] = $downloadCheck['requires_approval'];
+				$asset['download_request_status'] = $downloadCheck['request_status'] ?? null;
 			}
 			
 			sendJson([

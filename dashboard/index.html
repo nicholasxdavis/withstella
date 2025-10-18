@@ -56,7 +56,7 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-SPY1G645JS"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);} 
+      function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
       gtag('config', 'G-SPY1G645JS');
     </script>
@@ -1631,6 +1631,30 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="glass-card p-6 rounded-2xl">
+                            <h2 class="text-xl font-bold mb-6 text-center md:text-left">Download Requests</h2>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left">
+                                    <thead>
+                                        <tr class="border-b border-[var(--border-dark)]">
+                                            <th class="p-3">Asset</th>
+                                            <th class="p-3 hidden sm:table-cell">Requester</th>
+                                            <th class="p-3">Status</th>
+                                            <th class="p-3 hidden md:table-cell">Requested</th>
+                                            <th class="p-3 text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="download-requests-tbody">
+                                        <tr>
+                                            <td colspan="5" class="p-8 text-center text-[var(--text-secondary)]">
+                                                <i class="fas fa-download text-4xl mb-4"></i>
+                                                <p>No download requests yet</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 `;
                  document.getElementById('governance-page').innerHTML = `
@@ -2199,8 +2223,8 @@
 
                 // Enhanced Invite Member Modal Logic
                 const sendInviteBtn = document.getElementById('send-invite-btn');
-                const emailInput = document.getElementById('invite-email');
-                const roleSelect = document.getElementById('invite-role');
+                    const emailInput = document.getElementById('invite-email');
+                    const roleSelect = document.getElementById('invite-role');
                 const messageInput = document.getElementById('invite-message');
                 const emailValidation = document.getElementById('email-validation');
 
@@ -2215,21 +2239,21 @@
                     }
 
                     const email = emailInput.value.trim().toLowerCase();
-                    const role = roleSelect.value;
+                        const role = roleSelect.value;
                     const message = messageInput.value.trim();
-                    const currentUser = JSON.parse(sessionStorage.getItem('stella_user'));
+                        const currentUser = JSON.parse(sessionStorage.getItem('stella_user'));
                     
                     if (!currentUser) {
                         showToast('Please log in to send invitations', 'error');
                         return;
                     }
-
-                    // Check if already invited or already a member
+                        
+                        // Check if already invited or already a member
                     if (pendingInvites.some(inv => inv.email.toLowerCase() === email)) {
                         showToast('This user has already been invited.', 'warning');
-                        return;
-                    }
-                    
+                            return;
+                        }
+                        
                     if (teamMembers.some(mem => mem.email.toLowerCase() === email)) {
                         showToast('This user is already a team member.', 'warning');
                         return;
@@ -2238,63 +2262,63 @@
                     // Check if trying to invite self
                     if (email === currentUser.email.toLowerCase()) {
                         showToast('You cannot invite yourself to the team.', 'warning');
-                        return;
-                    }
-                    
-                    // Disable button while sending
-                    sendInviteBtn.disabled = true;
-                    sendInviteBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
-                    
-                    try {
-                        // Generate unique invite token
-                        const inviteToken = Array.from({length: 32}, () => 
-                            Math.random().toString(36)[2] || '0'
-                        ).join('');
-                        
-                        // Save invite to database
-                        const response = await fetch('/api/team.php?action=create-invite', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-User-ID': currentUser.id,
-                                'X-User-Email': currentUser.email
-                            },
-                            body: JSON.stringify({
-                                email: email,
-                                token: inviteToken,
-                                role: role,
-                                message: message
-                            })
-                        });
-                        
-                        const data = await response.json();
-                        
-                        if (!data.success) {
-                            throw new Error(data.message || 'Failed to create invite');
+                            return;
                         }
                         
-                        // Send invitation email via EmailJS with token in URL
-                        const inviteUrl = `${window.location.origin}/invite-accept.html?token=${inviteToken}`;
+                        // Disable button while sending
+                        sendInviteBtn.disabled = true;
+                    sendInviteBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
                         
-                        await emailjs.send(
-                            'service_7cdagjc', // Service ID
-                            'template_8k9lg7d', // Team Invite Template ID
-                            {
-                                to_name: email.split('@')[0], // Name from email
-                                user_email: email, // Try user_email
-                                to_email: email,   // Also send as to_email
-                                reply_to: email,   // And reply_to
-                                Greeting: `You've been invited to join ${currentUser.full_name}'s Stella workspace!`,
+                        try {
+                            // Generate unique invite token
+                            const inviteToken = Array.from({length: 32}, () => 
+                                Math.random().toString(36)[2] || '0'
+                            ).join('');
+                            
+                            // Save invite to database
+                            const response = await fetch('/api/team.php?action=create-invite', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                'X-User-ID': currentUser.id,
+                                'X-User-Email': currentUser.email
+                                },
+                                body: JSON.stringify({
+                                    email: email,
+                                    token: inviteToken,
+                                role: role,
+                                message: message
+                                })
+                            });
+                            
+                            const data = await response.json();
+                            
+                            if (!data.success) {
+                                throw new Error(data.message || 'Failed to create invite');
+                            }
+                            
+                            // Send invitation email via EmailJS with token in URL
+                            const inviteUrl = `${window.location.origin}/invite-accept.html?token=${inviteToken}`;
+                            
+                            await emailjs.send(
+                                'service_7cdagjc', // Service ID
+                                'template_8k9lg7d', // Team Invite Template ID
+                                {
+                                    to_name: email.split('@')[0], // Name from email
+                                    user_email: email, // Try user_email
+                                    to_email: email,   // Also send as to_email
+                                    reply_to: email,   // And reply_to
+                                    Greeting: `You've been invited to join ${currentUser.full_name}'s Stella workspace!`,
                                 Message: message || `${currentUser.full_name} (${currentUser.email}) has invited you to collaborate on their brand assets and files.`,
-                                ActionURL: inviteUrl,
+                                    ActionURL: inviteUrl,
                                 from_name: currentUser.full_name,
                                 role: role
-                            }
-                        );
-                        
-                        // Add to pending invites UI
-                        pendingInvites.push({
-                            email: email,
+                                }
+                            );
+                            
+                            // Add to pending invites UI
+                            pendingInvites.push({
+                                email: email,
                             role: role,
                             invitedAt: new Date().toISOString(),
                             invitedBy: currentUser.full_name
@@ -2308,26 +2332,26 @@
                         renderTeamOverview();
                         
                         logActivity('fa-user-plus', 'Invited team member', `Invited ${email} as ${role}`, new Date().toLocaleTimeString());
-                        
-                        if (!gettingStartedState.teamInvited) {
-                            gettingStartedState.teamInvited = true;
-                            ls.set(getUserDataKey('stella_getting_started'), gettingStartedState);
-                            renderGettingStarted();
-                            showToast('✅ Perfect! You invited a team member!', 'success');
+                            
+                            if (!gettingStartedState.teamInvited) {
+                                gettingStartedState.teamInvited = true;
+                                ls.set(getUserDataKey('stella_getting_started'), gettingStartedState);
+                                renderGettingStarted();
+                                showToast('✅ Perfect! You invited a team member!', 'success');
                         } else {
                             showToast(`Invitation sent to ${email} successfully!`, 'success');
-                        }
-                        
+                            }
+
                         // Clear form and close modal
                         clearInviteForm();
-                        document.getElementById('invite-member-modal').classList.remove('active');
+                            document.getElementById('invite-member-modal').classList.remove('active');
                         
-                    } catch (error) {
+                        } catch (error) {
                         console.error('Error sending invite:', error);
                         showToast(`Failed to send invitation: ${error.message}`, 'error');
-                    } finally {
+                        } finally {
                         // Re-enable button
-                        sendInviteBtn.disabled = false;
+                            sendInviteBtn.disabled = false;
                         sendInviteBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Send Invite';
                     }
                 });
@@ -2410,7 +2434,7 @@
                 const supportForm = document.getElementById('support-form');
                 supportForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
-                    if(supportForm.checkValidity()) {
+                     if(supportForm.checkValidity()) {
                         const currentUser = JSON.parse(sessionStorage.getItem('stella_user'));
                         if (!currentUser) {
                             showToast('Please log in to submit a support ticket', 'error');
@@ -2439,7 +2463,7 @@
                             
                             if (data.success) {
                                 showConfirmationModal("Ticket Created", `Thank you! Your support ticket #${data.ticket_id} has been created. We'll get back to you shortly.`);
-                                supportForm.reset();
+                         supportForm.reset();
                             } else {
                                 showToast('Failed to create ticket: ' + data.message, 'error');
                             }
@@ -3365,7 +3389,16 @@
                     if (downloadBtn) {
                         const assetId = parseFloat(downloadBtn.dataset.id);
                         const assetName = downloadBtn.dataset.name;
-                        // Open download URL with auth headers
+                        
+                        // Check download permissions first
+                        fetch(`/api/download_requests.php?action=check&asset_id=${assetId}`, {
+                            headers: getAuthHeaders()
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                if (data.can_download) {
+                                    // User can download directly
                         const downloadUrl = `/api/image_proxy.php?id=${assetId}&download=true`;
                         
                         fetch(downloadUrl, {
@@ -3386,6 +3419,47 @@
                         .catch(error => {
                             console.error('Download failed:', error);
                             showToast('Download failed', 'error');
+                                    });
+                                } else if (data.requires_approval) {
+                                    if (data.request_status === 'pending') {
+                                        showToast('Download request is pending approval', 'warning');
+                                    } else if (data.request_status === 'denied') {
+                                        showToast('Download request was denied', 'error');
+                                    } else {
+                                        // Create download request
+                                        fetch('/api/download_requests.php?action=create', {
+                                            method: 'POST',
+                                            headers: {
+                                                ...getAuthHeaders(),
+                                                'Content-Type': 'application/json'
+                                            },
+                                            body: JSON.stringify({
+                                                asset_id: assetId
+                                            })
+                                        })
+                                        .then(response => response.json())
+                                        .then(result => {
+                                            if (result.success) {
+                                                showToast('Download request submitted for approval', 'success');
+                                            } else {
+                                                showToast(result.message || 'Failed to submit download request', 'error');
+                                            }
+                                        })
+                                        .catch(error => {
+                                            console.error('Request failed:', error);
+                                            showToast('Failed to submit download request', 'error');
+                                        });
+                                    }
+                                } else {
+                                    showToast('You do not have permission to download this asset', 'error');
+                                }
+                            } else {
+                                showToast('Failed to check download permissions', 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Permission check failed:', error);
+                            showToast('Failed to check download permissions', 'error');
                         });
                         return;
                     }
@@ -3715,7 +3789,16 @@
                     if(downloadBtn) {
                         const assetId = parseFloat(downloadBtn.dataset.id);
                         const assetName = downloadBtn.dataset.name;
-                        // Open download URL with auth headers
+                        
+                        // Check download permissions first
+                        fetch(`/api/download_requests.php?action=check&asset_id=${assetId}`, {
+                            headers: getAuthHeaders()
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                if (data.can_download) {
+                                    // User can download directly
                         const downloadUrl = `/api/image_proxy.php?id=${assetId}&download=true`;
                         
                         fetch(downloadUrl, {
@@ -3736,6 +3819,47 @@
                         .catch(error => {
                             console.error('Download failed:', error);
                             showToast('Download failed', 'error');
+                                    });
+                                } else if (data.requires_approval) {
+                                    if (data.request_status === 'pending') {
+                                        showToast('Download request is pending approval', 'warning');
+                                    } else if (data.request_status === 'denied') {
+                                        showToast('Download request was denied', 'error');
+                                    } else {
+                                        // Create download request
+                                        fetch('/api/download_requests.php?action=create', {
+                                            method: 'POST',
+                                            headers: {
+                                                ...getAuthHeaders(),
+                                                'Content-Type': 'application/json'
+                                            },
+                                            body: JSON.stringify({
+                                                asset_id: assetId
+                                            })
+                                        })
+                                        .then(response => response.json())
+                                        .then(result => {
+                                            if (result.success) {
+                                                showToast('Download request submitted for approval', 'success');
+                                            } else {
+                                                showToast(result.message || 'Failed to submit download request', 'error');
+                                            }
+                                        })
+                                        .catch(error => {
+                                            console.error('Request failed:', error);
+                                            showToast('Failed to submit download request', 'error');
+                                        });
+                                    }
+                                } else {
+                                    showToast('You do not have permission to download this asset', 'error');
+                                }
+                            } else {
+                                showToast('Failed to check download permissions', 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Permission check failed:', error);
+                            showToast('Failed to check download permissions', 'error');
                         });
                         return;
                     }
@@ -4482,8 +4606,8 @@
                                     <i class="fas fa-crown text-white text-sm"></i>
                                 </div>
                                 <div>
-                                    <p class="font-medium">${currentUser.full_name} (You)</p>
-                                    <p class="sm:hidden text-xs text-[var(--text-secondary)]">${currentUser.email}</p>
+                            <p class="font-medium">${currentUser.full_name} (You)</p>
+                            <p class="sm:hidden text-xs text-[var(--text-secondary)]">${currentUser.email}</p>
                                 </div>
                             </div>
                         </td>
@@ -4513,8 +4637,8 @@
                                         <i class="${roleIcon} text-white text-sm"></i>
                                     </div>
                                     <div>
-                                        <p class="font-medium">${member.name}</p>
-                                        <p class="sm:hidden text-xs text-[var(--text-secondary)]">${member.email}</p>
+                                <p class="font-medium">${member.name}</p>
+                                <p class="sm:hidden text-xs text-[var(--text-secondary)]">${member.email}</p>
                                     </div>
                                 </div>
                             </td>
@@ -4552,8 +4676,8 @@
                                         <i class="fas fa-clock text-white text-sm"></i>
                                     </div>
                                     <div>
-                                        <p class="font-medium">${invite.email}</p>
-                                        <p class="sm:hidden text-xs text-[var(--text-secondary)]">${roleText} - PENDING</p>
+                                <p class="font-medium">${invite.email}</p>
+                                <p class="sm:hidden text-xs text-[var(--text-secondary)]">${roleText} - PENDING</p>
                                     </div>
                                 </div>
                             </td>
@@ -4704,6 +4828,153 @@
                         roleInfo.innerHTML = getRoleDescription(e.target.value);
                     }
                 });
+
+                // Download requests functionality
+                setupDownloadRequests();
+            }
+
+            // Download requests management
+            async function setupDownloadRequests() {
+                const tbody = document.getElementById('download-requests-tbody');
+                if (!tbody) return;
+
+                // Load download requests
+                await loadDownloadRequests();
+
+                // Add event listeners for approve/deny buttons
+                tbody.addEventListener('click', async (e) => {
+                    const approveBtn = e.target.closest('.approve-request-btn');
+                    const denyBtn = e.target.closest('.deny-request-btn');
+
+                    if (approveBtn) {
+                        const requestId = parseInt(approveBtn.dataset.id);
+                        await handleDownloadRequest(requestId, 'approve');
+                    }
+
+                    if (denyBtn) {
+                        const requestId = parseInt(denyBtn.dataset.id);
+                        await handleDownloadRequest(requestId, 'deny');
+                    }
+                });
+            }
+
+            async function loadDownloadRequests() {
+                try {
+                    const response = await fetch('/api/download_requests.php?action=list', {
+                        headers: getAuthHeaders()
+                    });
+                    const data = await response.json();
+
+                    if (data.success) {
+                        renderDownloadRequests(data.requests);
+                    } else {
+                        console.error('Failed to load download requests:', data.message);
+                    }
+                } catch (error) {
+                    console.error('Error loading download requests:', error);
+                }
+            }
+
+            function renderDownloadRequests(requests) {
+                const tbody = document.getElementById('download-requests-tbody');
+                if (!tbody) return;
+
+                if (requests.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="p-8 text-center text-[var(--text-secondary)]">
+                                <i class="fas fa-download text-4xl mb-4"></i>
+                                <p>No download requests yet</p>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                tbody.innerHTML = requests.map(request => {
+                    const statusClass = {
+                        'pending': 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30',
+                        'approved': 'bg-green-500/10 text-green-500 border-green-500/30',
+                        'denied': 'bg-red-500/10 text-red-500 border-red-500/30'
+                    }[request.status] || 'bg-gray-500/10 text-gray-500 border-gray-500/30';
+
+                    const requestedDate = new Date(request.requested_at).toLocaleDateString();
+                    const requestedTime = new Date(request.requested_at).toLocaleTimeString();
+
+                    return `
+                        <tr class="border-b border-[var(--border-dark)]">
+                            <td class="p-3">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fas fa-file-alt text-[var(--text-secondary)]"></i>
+                                    <div>
+                                        <p class="font-medium">${request.asset_name}</p>
+                                        <p class="text-xs text-[var(--text-secondary)]">${request.asset_type}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-3 hidden sm:table-cell">
+                                <div>
+                                    <p class="font-medium">${request.requester_name}</p>
+                                    <p class="text-xs text-[var(--text-secondary)]">${request.requester_email}</p>
+                                </div>
+                            </td>
+                            <td class="p-3">
+                                <span class="px-2 py-1 rounded-full text-xs border ${statusClass}">
+                                    ${request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                                </span>
+                            </td>
+                            <td class="p-3 hidden md:table-cell">
+                                <div>
+                                    <p class="text-sm">${requestedDate}</p>
+                                    <p class="text-xs text-[var(--text-secondary)]">${requestedTime}</p>
+                                </div>
+                            </td>
+                            <td class="p-3 text-right">
+                                ${request.status === 'pending' ? `
+                                    <div class="flex space-x-2 justify-end">
+                                        <button class="approve-request-btn px-3 py-1 bg-green-500/10 text-green-500 border border-green-500/30 rounded-full text-xs hover:bg-green-500/20 transition-colors" data-id="${request.id}">
+                                            <i class="fas fa-check mr-1"></i>Approve
+                                        </button>
+                                        <button class="deny-request-btn px-3 py-1 bg-red-500/10 text-red-500 border border-red-500/30 rounded-full text-xs hover:bg-red-500/20 transition-colors" data-id="${request.id}">
+                                            <i class="fas fa-times mr-1"></i>Deny
+                                        </button>
+                                    </div>
+                                ` : `
+                                    <span class="text-xs text-[var(--text-secondary)]">
+                                        ${request.reviewed_at ? `Reviewed ${new Date(request.reviewed_at).toLocaleDateString()}` : ''}
+                                    </span>
+                                `}
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            async function handleDownloadRequest(requestId, action) {
+                try {
+                    const response = await fetch(`/api/download_requests.php?action=${action}`, {
+                        method: 'POST',
+                        headers: {
+                            ...getAuthHeaders(),
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            request_id: requestId
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        showToast(`Download request ${action}d successfully`, 'success');
+                        await loadDownloadRequests(); // Reload the list
+                    } else {
+                        showToast(data.message || `Failed to ${action} download request`, 'error');
+                    }
+                } catch (error) {
+                    console.error(`Error ${action}ing download request:`, error);
+                    showToast(`Failed to ${action} download request`, 'error');
+                }
             }
 
             // Enhanced team management functions
@@ -4716,12 +4987,12 @@
                     }
 
                     // Remove from local storage
-                    pendingInvites = pendingInvites.filter(inv => inv.email !== email);
-                    ls.set(getUserDataKey('stella_pendingInvites'), pendingInvites);
+                            pendingInvites = pendingInvites.filter(inv => inv.email !== email);
+                            ls.set(getUserDataKey('stella_pendingInvites'), pendingInvites);
                     
                     // Update UI
-                    renderTeamMembers();
-                    renderTeamOverview();
+                            renderTeamMembers();
+                            renderTeamOverview();
                     
                     showToast(`Invitation to ${email} has been revoked`, 'success');
                     logActivity('fas fa-user-times', 'Revoked invitation', `Revoked invitation for ${email}`, new Date().toLocaleTimeString());
@@ -4746,12 +5017,12 @@
                     }
 
                     // Remove from local storage
-                    teamMembers = teamMembers.filter(m => m.id !== memberId);
-                    ls.set(getUserDataKey('stella_teamMembers'), teamMembers);
+                            teamMembers = teamMembers.filter(m => m.id !== memberId);
+                            ls.set(getUserDataKey('stella_teamMembers'), teamMembers);
                     
                     // Update UI
-                    renderTeamMembers();
-                    renderTeamOverview();
+                            renderTeamMembers();
+                            renderTeamOverview();
                     
                     showToast(`${member.name} has been removed from the team`, 'success');
                     logActivity('fas fa-user-minus', 'Removed team member', `Removed ${member.name} from team`, new Date().toLocaleTimeString());
@@ -4769,10 +5040,10 @@
                 }
 
                 // Populate modal with member data
-                editModal.querySelector('#edit-member-id').value = member.id;
-                editModal.querySelector('#edit-member-email').textContent = member.email;
+                            editModal.querySelector('#edit-member-id').value = member.id;
+                            editModal.querySelector('#edit-member-email').textContent = member.email;
                 editModal.querySelector('#edit-member-name').value = member.name || '';
-                editModal.querySelector('#edit-member-role').value = member.role;
+                            editModal.querySelector('#edit-member-role').value = member.role;
                 
                 // Show role-specific information
                 const roleInfo = editModal.querySelector('#role-info');
@@ -4780,17 +5051,17 @@
                     roleInfo.innerHTML = getRoleDescription(member.role);
                 }
                 
-                editModal.classList.add('active');
-            }
+                            editModal.classList.add('active');
+                        }
 
             function saveMemberChanges() {
                 const editModal = document.getElementById('edit-member-modal');
                 if (!editModal) return;
 
-                const memberId = parseInt(editModal.querySelector('#edit-member-id').value);
-                const newRole = editModal.querySelector('#edit-member-role').value;
+                    const memberId = parseInt(editModal.querySelector('#edit-member-id').value);
+                    const newRole = editModal.querySelector('#edit-member-role').value;
                 const newName = editModal.querySelector('#edit-member-name').value.trim();
-                const memberIndex = teamMembers.findIndex(m => m.id === memberId);
+                    const memberIndex = teamMembers.findIndex(m => m.id === memberId);
 
                 if (memberIndex === -1) {
                     showToast('Member not found', 'error');
@@ -4809,18 +5080,18 @@
                 }
 
                 // Update member data
-                teamMembers[memberIndex].role = newRole;
+                        teamMembers[memberIndex].role = newRole;
                 if (newName && newName !== oldName) {
                     teamMembers[memberIndex].name = newName;
                 }
                 teamMembers[memberIndex].updated_at = new Date().toISOString();
 
                 // Save to local storage
-                ls.set(getUserDataKey('stella_teamMembers'), teamMembers);
+                        ls.set(getUserDataKey('stella_teamMembers'), teamMembers);
                 
                 // Update UI
-                renderTeamMembers();
-                editModal.classList.remove('active');
+                        renderTeamMembers();
+                        editModal.classList.remove('active');
                 
                 // Show success message
                 let message = 'Member updated successfully';

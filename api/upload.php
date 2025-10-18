@@ -21,6 +21,7 @@ function sendJson($data, $statusCode = 200) {
 // Load Nextcloud Storage Service and Auth Helper
 require_once dirname(__DIR__) . '/app/Services/NextcloudStorage.php';
 require_once __DIR__ . '/auth_helper.php';
+require_once __DIR__ . '/team_permissions.php';
 use App\Services\NextcloudStorage;
 
 // Database connection
@@ -58,6 +59,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			$userId = getAuthenticatedUserId($pdo);
 		} catch (Exception $e) {
 			sendJson(['success' => false, 'message' => $e->getMessage()], 401);
+		}
+		
+		// Check if user has permission to upload assets
+		if (!hasTeamPermission($pdo, $userId, 'upload_assets')) {
+			sendJson(['success' => false, 'message' => 'You do not have permission to upload assets'], 403);
 		}
 		
 		// Get Nextcloud credentials (uses workspace owner's credentials for team members)

@@ -20,6 +20,7 @@ function sendJson($data, $statusCode = 200) {
 
 // Load Auth Helper
 require_once __DIR__ . '/auth_helper.php';
+require_once __DIR__ . '/team_permissions.php';
 require_once dirname(__DIR__) . '/app/Services/NextcloudStorage.php';
 use App\Services\NextcloudStorage;
 
@@ -107,6 +108,11 @@ switch ($action) {
 		
 	case 'create':
 		try {
+			// Check if user has permission to create brand kits
+			if (!hasTeamPermission($pdo, $userId, 'create_kits')) {
+				sendJson(['success' => false, 'message' => 'You do not have permission to create brand kits'], 403);
+			}
+			
 			$name = $_POST['name'] ?? null;
 			$description = $_POST['description'] ?? '';
 			$logoAssetId = $_POST['logo_asset_id'] ?? null;

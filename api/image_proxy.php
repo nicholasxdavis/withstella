@@ -14,6 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // Load services
 require_once dirname(__DIR__) . '/app/Services/NextcloudStorage.php';
 require_once __DIR__ . '/auth_helper.php';
+require_once __DIR__ . '/team_permissions.php';
 use App\Services\NextcloudStorage;
 
 // Database connection
@@ -78,6 +79,19 @@ try {
 		$asset = $stmt->fetch();
 		
 		if ($asset) {
+			// Check download permissions if this is a download request
+			if ($download) {
+				$downloadCheck = checkDownloadPermission($pdo, $userId, $assetId);
+				if (!$downloadCheck['can_download']) {
+					http_response_code(403);
+					if ($downloadCheck['requires_approval']) {
+						exit('Download requires approval. Please request permission first.');
+					} else {
+						exit('You do not have permission to download this asset');
+					}
+				}
+			}
+			
 			// Use workspace owner's credentials if team member, otherwise own credentials
 			$userCreds = [
 				'nextcloud_username' => $asset['owner_nc_username'] ?? $asset['nextcloud_username'],
