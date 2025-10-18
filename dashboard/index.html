@@ -623,12 +623,10 @@
                     <i class="fas fa-folder-open w-5 text-center"></i>
                     <span>Asset Hub</span>
                 </div>
-                ${hasAdminPermissions() ? `
-                <div class="nav-item p-3 rounded-3xl flex items-center space-x-3 text-white" data-page="team-settings">
+                <div class="nav-item p-3 rounded-3xl flex items-center space-x-3 text-white" data-page="team-settings" id="team-settings-nav" style="display: none;">
                     <i class="fas fa-users-cog w-5 text-center"></i>
                     <span>Team Settings</span>
                 </div>
-                ` : ''}
                 <div class="nav-item p-3 rounded-3xl flex items-center space-x-3 text-white" data-page="api">
                     <i class="fas fa-code w-5 text-center"></i>
                     <span>Stella Api</span>
@@ -687,12 +685,10 @@
                             <i class="fas fa-folder-open w-5 text-center"></i>
                             <span>Asset Hub</span>
                         </div>
-                        ${hasAdminPermissions() ? `
-                        <div class="nav-item p-3 rounded-3xl flex items-center space-x-3 text-white" data-page="team-settings">
+                        <div class="nav-item p-3 rounded-3xl flex items-center space-x-3 text-white" data-page="team-settings" id="team-settings-nav-mobile" style="display: none;">
                             <i class="fas fa-users-cog w-5 text-center"></i>
                             <span>Team Settings</span>
                         </div>
-                        ` : ''}
                         <div class="nav-item p-3 rounded-3xl flex items-center space-x-3 text-white" data-page="api">
                             <i class="fas fa-code w-5 text-center"></i>
                             <span>Stella Api</span>
@@ -1241,6 +1237,20 @@
                 set: (key, value) => localStorage.setItem(key, JSON.stringify(value)),
             };
 
+            // --- NAVIGATION PERMISSIONS ---
+            function updateNavigationPermissions() {
+                const hasAdmin = hasAdminPermissions();
+                const teamSettingsNav = document.getElementById('team-settings-nav');
+                const teamSettingsNavMobile = document.getElementById('team-settings-nav-mobile');
+                
+                if (teamSettingsNav) {
+                    teamSettingsNav.style.display = hasAdmin ? 'flex' : 'none';
+                }
+                if (teamSettingsNavMobile) {
+                    teamSettingsNavMobile.style.display = hasAdmin ? 'flex' : 'none';
+                }
+            }
+
             function getUserDataKey(baseKey) {
                 return `${userPrefix}_${baseKey}`;
             }
@@ -1370,6 +1380,9 @@
                 // Load team members and pending invites from database API to ensure we have the latest data
                 await loadTeamMembersFromAPI();
                 await loadPendingInvitesFromAPI();
+                
+                // Update navigation permissions based on user role
+                updateNavigationPermissions();
 
                 // Load assets from database API (syncs across devices)
                 try {
@@ -2206,6 +2219,7 @@
                         } else if (pageId === 'team-settings') {
                             loadTeamMembersFromAPI();
                             loadPendingInvitesFromAPI();
+                            updateNavigationPermissions();
                         }
 
                         // Close mobile sidebar on navigation
@@ -4668,6 +4682,9 @@
                         // Update UI
                         renderTeamMembers();
                         renderTeamOverview();
+                        
+                        // Update navigation permissions after team members are loaded
+                        updateNavigationPermissions();
                     }
                 } catch (error) {
                     console.error('Error loading team members from API:', error);
@@ -4725,8 +4742,20 @@
             function hasAdminPermissions() {
                 const currentUser = JSON.parse(sessionStorage.getItem('stella_user'));
                 if (!currentUser) return false;
+                
+                // First, try to find the user in team members
                 const currentUserMember = teamMembers.find(member => member.id === currentUser.id);
-                return currentUserMember && ['Owner', 'Admin'].includes(currentUserMember.role);
+                if (currentUserMember && ['Owner', 'Admin'].includes(currentUserMember.role)) {
+                    return true;
+                }
+                
+                // If not found in team members, check if user has workspace_owner_id set to their own ID
+                // This indicates they are the workspace owner
+                if (currentUser.workspace_owner_id === currentUser.id || !currentUser.workspace_owner_id) {
+                    return true;
+                }
+                
+                return false;
             }
 
             function renderTeamMembers() {
@@ -4813,7 +4842,7 @@
                 
                 // Pending invites with enhanced styling (only show for admin users)
                 if (hasAdminPermissions()) {
-                    pendingInvites.forEach(invite => {
+                pendingInvites.forEach(invite => {
                     const roleText = invite.role || 'Team Member';
                     const roleIcon = getRoleIcon(roleText);
                     const roleColor = getRoleColor(roleText);
@@ -4849,7 +4878,7 @@
                         </tr>
                     `;
                     tbody.innerHTML += row;
-                    });
+                });
                 }
             }
 
@@ -5165,12 +5194,12 @@
 
                     if (data.success) {
                         // Remove from local storage
-                        pendingInvites = pendingInvites.filter(inv => inv.email !== email);
-                        ls.set(getUserDataKey('stella_pendingInvites'), pendingInvites);
+                            pendingInvites = pendingInvites.filter(inv => inv.email !== email);
+                            ls.set(getUserDataKey('stella_pendingInvites'), pendingInvites);
                         
                         // Update UI
-                        renderTeamMembers();
-                        renderTeamOverview();
+                            renderTeamMembers();
+                            renderTeamOverview();
                         
                         showToast(`Invitation to ${email} has been revoked`, 'success');
                         logActivity('fas fa-user-times', 'Revoked invitation', `Revoked invitation for ${email}`, new Date().toLocaleTimeString());
