@@ -1339,8 +1339,9 @@
                     kitCreated: false, assetUploaded: false, teamInvited: false, completed: false, dismissed: false
                 });
 
-                // Load team members from database API to ensure we have the latest data
+                // Load team members and pending invites from database API to ensure we have the latest data
                 await loadTeamMembersFromAPI();
+                await loadPendingInvitesFromAPI();
 
                 // Load assets from database API (syncs across devices)
                 try {
@@ -2166,6 +2167,7 @@
                             loadAnalyticsData();
                         } else if (pageId === 'team-settings') {
                             loadTeamMembersFromAPI();
+                            loadPendingInvitesFromAPI();
                         }
 
                         // Close mobile sidebar on navigation
@@ -3068,7 +3070,7 @@
 
             function showConfirmationModal(title, message) {
                 document.getElementById('confirmation-title').textContent = title;
-                document.getElementById('confirmation-message').textContent = message;
+                document.getElementById('confirmation-message').innerHTML = message;
                 document.getElementById('confirmation-modal').classList.add('active');
             }
 
@@ -4628,6 +4630,39 @@
                 }
             }
 
+            async function loadPendingInvitesFromAPI() {
+                try {
+                    const currentUser = JSON.parse(sessionStorage.getItem('stella_user'));
+                    if (!currentUser) return;
+
+                    const response = await fetch('/api/team.php?action=list-pending-invites', {
+                        headers: getAuthHeaders()
+                    });
+                    const data = await response.json();
+
+                    if (data.success && data.invites) {
+                        // Update pending invites with data from API
+                        pendingInvites = data.invites.map(invite => ({
+                            id: invite.id,
+                            email: invite.email,
+                            role: invite.role,
+                            token: invite.token,
+                            created_at: invite.created_at,
+                            expires_at: invite.expires_at
+                        }));
+
+                        // Save to local storage for offline access
+                        ls.set(getUserDataKey('stella_pendingInvites'), pendingInvites);
+
+                        // Update UI
+                        renderTeamMembers();
+                        renderTeamOverview();
+                    }
+                } catch (error) {
+                    console.error('Error loading pending invites from API:', error);
+                }
+            }
+
             function renderTeamMembers() {
                 const tbody = document.getElementById('team-members-tbody');
                 if(!tbody) return; 
@@ -5026,16 +5061,43 @@
                         return;
                     }
 
-                    // Remove from local storage
-                            pendingInvites = pendingInvites.filter(inv => inv.email !== email);
-                            ls.set(getUserDataKey('stella_pendingInvites'), pendingInvites);
-                    
-                    // Update UI
-                            renderTeamMembers();
-                            renderTeamOverview();
-                    
-                    showToast(`Invitation to ${email} has been revoked`, 'success');
-                    logActivity('fas fa-user-times', 'Revoked invitation', `Revoked invitation for ${email}`, new Date().toLocaleTimeString());
+                    // Find the invite to get the token
+                    const invite = pendingInvites.find(inv => inv.email === email);
+                    if (!invite) {
+                        showToast('Invitation not found', 'error');
+                        return;
+                    }
+
+                    // Call API to revoke the invitation
+                    const response = await fetch('/api/team.php?action=revoke-invite', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-User-ID': currentUser.id,
+                            'X-User-Email': currentUser.email
+                        },
+                        body: JSON.stringify({
+                            email: email,
+                            token: invite.token
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Remove from local storage
+                        pendingInvites = pendingInvites.filter(inv => inv.email !== email);
+                        ls.set(getUserDataKey('stella_pendingInvites'), pendingInvites);
+                        
+                        // Update UI
+                        renderTeamMembers();
+                        renderTeamOverview();
+                        
+                        showToast(`Invitation to ${email} has been revoked`, 'success');
+                        logActivity('fas fa-user-times', 'Revoked invitation', `Revoked invitation for ${email}`, new Date().toLocaleTimeString());
+                    } else {
+                        showToast(data.message || 'Failed to revoke invitation', 'error');
+                    }
                 } catch (error) {
                     console.error('Error revoking invite:', error);
                     showToast('Failed to revoke invitation', 'error');

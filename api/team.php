@@ -77,6 +77,10 @@ switch ($action) {
     case 'remove-member':
         handleRemoveMember($pdo, $userId, $data);
         break;
+
+    case 'revoke-invite':
+        handleRevokeInvite($pdo, $userId, $data);
+        break;
     
     default:
         sendJson(['success' => false, 'message' => 'Invalid action'], 400);
@@ -251,6 +255,35 @@ function handleRemoveMember(PDO $pdo, int $userId, array $data) {
         $pdo->prepare("UPDATE team_members SET status = 'removed', updated_at = NOW() WHERE workspace_owner_id = ? AND member_email = ?")
             ->execute([$ownerId, $email]);
         sendJson(['success' => true, 'message' => 'Member removed']);
+    } catch (PDOException $e) {
+        sendJson(['success' => false, 'message' => 'Database error'], 500);
+    }
+}
+
+/**
+ * Revoke pending invite
+ */
+function handleRevokeInvite(PDO $pdo, int $userId, array $data) {
+    try {
+        $ctx = getOwnerContext($pdo, $userId);
+        $ownerId = $ctx['owner_id'];
+        
+        $email = trim($data['email'] ?? '');
+        $token = trim($data['token'] ?? '');
+        
+        if (empty($email)) {
+            sendJson(['success' => false, 'message' => 'Email is required'], 400);
+        }
+        
+        // Delete the pending invite
+        $stmt = $pdo->prepare("DELETE FROM pending_invites WHERE inviter_id = ? AND email = ?");
+        $stmt->execute([$ownerId, $email]);
+        
+        if ($stmt->rowCount() > 0) {
+            sendJson(['success' => true, 'message' => 'Invitation revoked successfully']);
+        } else {
+            sendJson(['success' => false, 'message' => 'Invitation not found'], 404);
+        }
     } catch (PDOException $e) {
         sendJson(['success' => false, 'message' => 'Database error'], 500);
     }
