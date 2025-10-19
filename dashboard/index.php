@@ -1136,21 +1136,21 @@
                         <i class="fas fa-code w-5 text-center"></i>
                         <span>Stella Api</span>
                     </div>
-                    <span class="pro-badge text-xs bg-gradient-to-r from-purple-500 to-pink-500 px-2 py-1 rounded-full font-semibold">PRO</span>
+                    <span class="pro-badge text-xs px-2 py-1 rounded-full font-semibold" style="background-color: #9c7ead;">PRO</span>
                 </div>
                 <div class="nav-item p-3 rounded-3xl flex items-center justify-between text-white" data-page="governance" data-requires-pro="true">
                     <div class="flex items-center space-x-3">
                         <i class="fas fa-shield-alt w-5 text-center"></i>
                         <span>Governance</span>
                     </div>
-                    <span class="pro-badge text-xs bg-gradient-to-r from-purple-500 to-pink-500 px-2 py-1 rounded-full font-semibold">PRO</span>
+                    <span class="pro-badge text-xs px-2 py-1 rounded-full font-semibold" style="background-color: #9c7ead;">PRO</span>
                 </div>
                 <div class="nav-item p-3 rounded-3xl flex items-center justify-between text-white" data-page="analytics" data-requires-pro="true">
                     <div class="flex items-center space-x-3">
                         <i class="fas fa-chart-line w-5 text-center"></i>
                         <span>Analytics</span>
                     </div>
-                    <span class="pro-badge text-xs bg-gradient-to-r from-purple-500 to-pink-500 px-2 py-1 rounded-full font-semibold">PRO</span>
+                    <span class="pro-badge text-xs px-2 py-1 rounded-full font-semibold" style="background-color: #9c7ead;">PRO</span>
                 </div>
                 <div class="nav-item p-3 rounded-3xl flex items-center space-x-3 text-white" data-page="billing">
                     <i class="fas fa-credit-card w-5 text-center"></i>
@@ -1211,21 +1211,21 @@
                                 <i class="fas fa-code w-5 text-center"></i>
                                 <span>Stella Api</span>
                             </div>
-                            <span class="pro-badge text-xs bg-gradient-to-r from-purple-500 to-pink-500 px-2 py-1 rounded-full font-semibold">PRO</span>
+                            <span class="pro-badge text-xs px-2 py-1 rounded-full font-semibold" style="background-color: #9c7ead;">PRO</span>
                         </div>
                         <div class="nav-item p-3 rounded-3xl flex items-center justify-between text-white" data-page="governance" data-requires-pro="true">
                             <div class="flex items-center space-x-3">
                                 <i class="fas fa-shield-alt w-5 text-center"></i>
                                 <span>Governance</span>
                             </div>
-                            <span class="pro-badge text-xs bg-gradient-to-r from-purple-500 to-pink-500 px-2 py-1 rounded-full font-semibold">PRO</span>
+                            <span class="pro-badge text-xs px-2 py-1 rounded-full font-semibold" style="background-color: #9c7ead;">PRO</span>
                         </div>
                         <div class="nav-item p-3 rounded-3xl flex items-center justify-between text-white" data-page="analytics" data-requires-pro="true">
                             <div class="flex items-center space-x-3">
                                 <i class="fas fa-chart-line w-5 text-center"></i>
                                 <span>Analytics</span>
                             </div>
-                            <span class="pro-badge text-xs bg-gradient-to-r from-purple-500 to-pink-500 px-2 py-1 rounded-full font-semibold">PRO</span>
+                            <span class="pro-badge text-xs px-2 py-1 rounded-full font-semibold" style="background-color: #9c7ead;">PRO</span>
                         </div>
                         <div class="nav-item p-3 rounded-3xl flex items-center space-x-3 text-white" data-page="billing">
                             <i class="fas fa-credit-card w-5 text-center"></i>
@@ -3732,15 +3732,15 @@
                         const rulesList = document.getElementById('governance-rules-list');
                         if (rulesList) {
                             rulesList.innerHTML = `
-                                <div class="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-xl p-8 text-center">
-                                    <div class="text-5xl mb-4 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+                                <div class="border rounded-xl p-8 text-center" style="background-color: rgba(156, 122, 173, 0.1); border-color: rgba(156, 122, 173, 0.3);">
+                                    <div class="text-5xl mb-4" style="color: #9c7ead;">
                                         <i class="fas fa-crown"></i>
                                     </div>
                                     <h3 class="text-xl font-bold mb-2">Governance is a Pro Feature</h3>
                                     <p class="text-[var(--text-secondary)] mb-4">
                                         Upgrade to Pro to create brand governance rules and maintain consistent messaging.
                                     </p>
-                                    <button onclick="showProUpgradePrompt('Governance')" class="btn btn-primary px-6 py-3 rounded-full font-semibold bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transition-all">
+                                    <button onclick="showProUpgradePrompt('Governance')" class="btn btn-primary px-6 py-3 rounded-full font-semibold transition-all" style="background-color: #9c7ead; border-color: #9c7ead;" onmouseover="this.style.backgroundColor='#8b6c9c'" onmouseout="this.style.backgroundColor='#9c7ead'">
                                         <i class="fas fa-rocket mr-2"></i>Upgrade to Pro
                                     </button>
                                 </div>
@@ -3869,15 +3869,15 @@
                         const keysList = document.getElementById('api-keys-list');
                         if (keysList) {
                             keysList.innerHTML = `
-                                <div class="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-xl p-8 text-center">
-                                    <div class="text-5xl mb-4 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+                                <div class="border rounded-xl p-8 text-center" style="background-color: rgba(156, 122, 173, 0.1); border-color: rgba(156, 122, 173, 0.3);">
+                                    <div class="text-5xl mb-4" style="color: #9c7ead;">
                                         <i class="fas fa-crown"></i>
                                     </div>
                                     <h3 class="text-xl font-bold mb-2">API Keys are a Pro Feature</h3>
                                     <p class="text-[var(--text-secondary)] mb-4">
                                         Upgrade to Pro to create API keys and integrate Stella with external applications.
                                     </p>
-                                    <button onclick="showProUpgradePrompt('Stella Api')" class="btn btn-primary px-6 py-3 rounded-full font-semibold bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transition-all">
+                                    <button onclick="showProUpgradePrompt('Stella Api')" class="btn btn-primary px-6 py-3 rounded-full font-semibold transition-all" style="background-color: #9c7ead; border-color: #9c7ead;" onmouseover="this.style.backgroundColor='#8b6c9c'" onmouseout="this.style.backgroundColor='#9c7ead'">
                                         <i class="fas fa-rocket mr-2"></i>Upgrade to Pro
                                     </button>
                                 </div>
@@ -7113,7 +7113,7 @@
                 title.innerHTML = '<i class="fas fa-crown text-yellow-400 mr-2"></i>Upgrade to Pro';
                 body.innerHTML = `
                     <div class="text-center py-4">
-                        <div class="text-6xl mb-4 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+                        <div class="text-6xl mb-4" style="color: #9c7ead;">
                             <i class="fas fa-lock"></i>
                         </div>
                         <h3 class="text-2xl font-bold text-white mb-3">${featureName} is a Pro Feature</h3>
@@ -7123,29 +7123,29 @@
                         <div class="space-y-3 text-left bg-white/5 rounded-xl p-4 mb-6">
                             <div class="flex items-center space-x-3">
                                 <i class="fas fa-check-circle text-green-500"></i>
-                                <span>🔐 API Keys for external integrations</span>
+                                <span>API Keys for external integrations</span>
                             </div>
                             <div class="flex items-center space-x-3">
                                 <i class="fas fa-check-circle text-green-500"></i>
-                                <span>🛡️ Brand Governance & Content Rules</span>
+                                <span>Brand Governance & Content Rules</span>
                             </div>
                             <div class="flex items-center space-x-3">
                                 <i class="fas fa-check-circle text-green-500"></i>
-                                <span>📊 Advanced Analytics & Insights</span>
+                                <span>Advanced Analytics & Insights</span>
                             </div>
                             <div class="flex items-center space-x-3">
                                 <i class="fas fa-check-circle text-green-500"></i>
-                                <span>⚡ Priority Support</span>
+                                <span>Priority Support</span>
                             </div>
                         </div>
                         <p class="text-sm text-[var(--text-secondary)]">
-                            Starting at just <span class="text-white font-bold">$29/month</span>
+                            Starting at just <span class="text-white font-bold">$15/month</span>
                         </p>
                     </div>
                 `;
                 
                 btnContainer.innerHTML = `
-                    <button class="btn btn-primary px-6 py-3 rounded-full font-semibold bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transition-all" onclick="document.getElementById('confirmation-modal').classList.remove('active'); document.querySelectorAll('.nav-item[data-page=\\'billing\\']')[0].click();">
+                    <button class="btn btn-primary px-6 py-3 rounded-full font-semibold transition-all" style="background-color: #9c7ead; border-color: #9c7ead;" onmouseover="this.style.backgroundColor='#8b6c9c'" onmouseout="this.style.backgroundColor='#9c7ead'" onclick="document.getElementById('confirmation-modal').classList.remove('active'); document.querySelectorAll('.nav-item[data-page=\\'billing\\']')[0].click();">
                         <i class="fas fa-rocket mr-2"></i>Upgrade to Pro
                     </button>
                     <button class="btn btn-secondary px-6 py-3 rounded-full font-semibold" onclick="document.getElementById('confirmation-modal').classList.remove('active');">
