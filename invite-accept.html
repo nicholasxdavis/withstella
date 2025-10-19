@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Team - Stella</title>
+    <link rel="stylesheet" href="https://assets.vercel.com/raw/upload/v1587415301/fonts/2/Geist.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        /* Animated background */
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(156, 126, 173, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(156, 126, 173, 0.1) 0%, transparent 50%);
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .card {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(10, 10, 10, 0.95) 100%);
+            border-radius: 24px;
+            padding: 3rem;
+            border: 2px solid rgba(156, 126, 173, 0.2);
+            box-shadow: 0 25px 70px rgba(156, 126, 173, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-icon {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            display: inline-block;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .logo-icon span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #9c7ead, transparent);
+            box-shadow: 0 0 15px #9c7ead;
+        }
+
+        .logo-icon span:first-child {
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+
+        .logo-icon span:last-child {
+            transform: translate(-50%, -50%) rotate(-45deg);
+        }
+
+        @keyframes pulse {
+            0%, 100% { filter: drop-shadow(0 0 20px #9c7ead); }
+            50% { filter: drop-shadow(0 0 35px #9c7ead); }
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            text-align: center;
+            margin: 1.5rem 0 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #aaa;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .inviter {
+            color: #9c7ead;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .email-badge {
+            text-align: center;
+            margin: 1.5rem 0;
+            padding: 0.75rem 1.5rem;
+            background: rgba(156, 126, 173, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(156, 126, 173, 0.3);
+        }
+
+        .email-badge span {
+            color: #9c7ead;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        form {
+            margin-top: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            color: #ddd;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 12px;
+            border: 2px solid #333;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 1rem;
+            font-family: 'Geist', sans-serif;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #9c7ead;
+            box-shadow: 0 0 0 3px rgba(156, 126, 173, 0.2);
+        }
+
+        input::placeholder {
+            color: #666;
+        }
+
+        .hint {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            border-radius: 14px;
+            border: none;
+            background: linear-gradient(135deg, #9c7ead 0%, #826a94 100%);
+            color: white;
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 6px 20px rgba(156, 126, 173, 0.4);
+            letter-spacing: 0.3px;
+            font-family: 'Geist', sans-serif;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(156, 126, 173, 0.5);
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .error {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            color: #ff6b6b;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+
+        .footer {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .footer-text {
+            color: #999;
+            font-size: 0.875rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .footer a {
+            color: #9c7ead;
+            text-decoration: none;
+            font-weight: 700;
+            transition: color 0.2s;
+        }
+
+        .footer a:hover {
+            color: #b48fc4;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(156, 126, 173, 0.2);
+            border-top-color: #9c7ead;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-card {
+            text-align: center;
+        }
+
+        .error-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            border-radius: 50%;
+            background: rgba(255, 68, 68, 0.15);
+            border: 2px solid rgba(255, 68, 68, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .error-icon svg {
+            width: 40px;
+            height: 40px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient"></div>
+    
+    <div class="container">
+        <div class="card">
+            <!-- Loading State -->
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p style="color: #aaa;">Verifying your invitation...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="error-state" class="hidden error-card">
+                <div class="error-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#ff4444" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                </div>
+                <h1 style="color: #ff4444; margin-bottom: 1rem;">Invite Not Valid</h1>
+                <p id="error-message" style="color: #bbb; margin-bottom: 2rem; line-height: 1.6;"></p>
+                <a href="/" style="display: inline-block; padding: 14px 36px; border-radius: 14px; background: linear-gradient(135deg, #9c7ead 0%, #826a94 100%); color: white; text-decoration: none; font-weight: 700; box-shadow: 0 6px 20px rgba(156, 126, 173, 0.4);">← Back to Homepage</a>
+            </div>
+
+            <!-- Form State -->
+            <div id="form-state" class="hidden">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <h1>Welcome to the Team! 🎉</h1>
+                    <p class="subtitle">
+                        <span class="inviter" id="inviter-name"></span> invited you to collaborate
+                    </p>
+                </div>
+
+                <div class="email-badge">
+                    <span id="invited-email"></span>
+                </div>
+
+                <form id="accept-form">
+                    <div class="form-group">
+                        <label for="full-name">Your Full Name</label>
+                        <input type="text" id="full-name" placeholder="e.g. Jane Smith" required autocomplete="name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Create Password</label>
+                        <input type="password" id="password" placeholder="Minimum 8 characters" required minlength="8" autocomplete="new-password">
+                        <p class="hint">Use a strong password with letters, numbers & symbols</p>
+                    </div>
+
+                    <button type="submit" id="submit-btn">
+                        Accept Invite & Join Workspace →
+                    </button>
+
+                    <div id="form-error" class="error"></div>
+                </form>
+
+                <div class="footer">
+                    <p class="footer-text">Already have an account?</p>
+                    <a href="/">Sign in instead →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get token from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+
+        // Elements
+        const loading = document.getElementById('loading');
+        const errorState = document.getElementById('error-state');
+        const formState = document.getElementById('form-state');
+        const form = document.getElementById('accept-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const formError = document.getElementById('form-error');
+
+        // Verify invite on load
+        if (!token) {
+            showError('No invitation token provided. Please use the link from your email.');
+        } else {
+            verifyInvite(token);
+        }
+
+        async function verifyInvite(token) {
+            try {
+                const response = await fetch('/api/auth.php?action=verify-invite', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.invite) {
+                    showForm(data.invite);
+                } else {
+                    showError(data.message || 'This invitation link is invalid or has expired.');
+                }
+            } catch (error) {
+                console.error('Verification error:', error);
+                showError('Failed to verify invitation. Please check your connection and try again.');
+            }
+        }
+
+        function showForm(invite) {
+            loading.classList.add('hidden');
+            formState.classList.remove('hidden');
+            
+            document.getElementById('inviter-name').textContent = invite.inviter_name;
+            document.getElementById('invited-email').textContent = invite.email;
+            document.getElementById('full-name').focus();
+        }
+
+        function showError(message) {
+            loading.classList.add('hidden');
+            errorState.classList.remove('hidden');
+            document.getElementById('error-message').textContent = message;
+        }
+
+        // Handle form submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const fullName = document.getElementById('full-name').value.trim();
+            const password = document.getElementById('password').value;
+
+            // Validate
+            if (fullName.length < 2) {
+                showFormError('⚠️ Please enter your full name');
+                return;
+            }
+
+            if (password.length < 8) {
+                showFormError('⚠️ Password must be at least 8 characters');
+                return;
+            }
+
+            // Disable form
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Creating your account...';
+            formError.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/auth.php?action=accept-invite', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        token: token,
+                        full_name: fullName,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.user) {
+                    // Store auth data
+                    sessionStorage.setItem('stella_auth', 'authenticated');
+                    sessionStorage.setItem('stella_user', JSON.stringify(data.user));
+                    sessionStorage.setItem('stella_is_new_member', 'true');
+
+                    // Show success
+                    submitBtn.textContent = '✓ Account created! Redirecting...';
+                    submitBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                    
+                    formError.textContent = '✓ Success! Taking you to your workspace...';
+                    formError.classList.add('success');
+                    formError.style.display = 'block';
+
+                    // Redirect to dashboard
+                    setTimeout(() => {
+                        window.location.href = '/dashboard/';
+                    }, 1500);
+                } else {
+                    showFormError('❌ ' + (data.message || 'Failed to create account. Please try again.'));
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Accept Invite & Join Workspace →';
+                }
+            } catch (error) {
+                console.error('Accept error:', error);
+                showFormError('❌ Network error. Please check your connection and try again.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Accept Invite & Join Workspace →';
+            }
+        });
+
+        function showFormError(message) {
+            formError.textContent = message;
+            formError.classList.remove('success');
+            formError.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stella AI - Your Brand, Unified. Instantly.</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://kit.fontawesome.com/a2e0a4d3f1.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+    <link rel="stylesheet" href="https://assets.vercel.com/raw/upload/v1587415301/fonts/2/Geist.css">
+    
+    <script type="text/javascript">
+        // Initialize EmailJS
+        (function(){
+            emailjs.init("bHnfaYAMCqIRNjinh");
+        })();
+    </script>
+    
+    <!-- Global error handler to suppress passkey errors from extensions -->
+    <script>
+        window.addEventListener('error', function(event) {
+            // Suppress passkey errors from browser extensions
+            if (event.filename && (event.filename.includes('passkey') || event.filename.includes('extension'))) {
+                event.preventDefault();
+                return true;
+            }
+        }, true);
+        
+        // Suppress unhandled promise rejections from extensions
+        window.addEventListener('unhandledrejection', function(event) {
+            if (event.reason && event.reason.stack && 
+                (event.reason.stack.includes('passkey') || event.reason.stack.includes('extension'))) {
+                event.preventDefault();
+            }
+        });
+    </script>
+
+    <style>
+        :root {
+            /* Dark Mode Palette */
+            --bg-dark: #000;
+            --card-dark: #0a0a0a;
+            --border-dark: #232323;
+            --text-title-dark: #ededed;
+            --text-p-dark: #a19e97;
+            --btn-special-bg-dark: #ededed;
+            --btn-special-text-dark: #333;
+            /* Brand Colors */
+            --brand-blue: #9c7ead;
+        }
+
+        /* Base Styles */
+        body {
+            font-family: 'Geist', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: var(--bg-dark);
+            color: var(--text-p-dark);
+        }
+        
+        .font-geist-mono {
+            font-family: 'Geist Mono', monospace;
+        }
+
+        h1, h2, h3, h4, h5, h6 { color: var(--text-title-dark); }
+        .main-card { background-color: var(--card-dark); border-color: var(--border-dark); }
+        .main-button { background-color: var(--card-dark); border-color: var(--border-dark); color: var(--text-title-dark); }
+        .special-button { background-color: var(--btn-special-bg-dark); color: var(--btn-special-text-dark); }
+        .header { background-color: rgba(0,0,0,0.5); border-color: var(--border-dark); }
+        .header a { color: var(--text-title-dark); }
+        .integration-logo img, .testimonial-logo { filter: grayscale(1) brightness(5) opacity(0.8); }
+        .logo-text { color: #fff; }
+
+        /* Glow Button Effect */
+        .glow-btn { position: relative; overflow: hidden; transition: all 0.3s ease; transform: translateZ(0); }
+        .glow-btn:active { transform: scale(0.97); transition-duration: 0.1s; }
+        .glow-btn::before {
+            content: ''; position: absolute; top: 50%; left: 50%;
+            width: 0; height: 0;
+            background: radial-gradient(circle, #9c7ead 0%, rgba(156, 126, 173, 0) 70%);
+            border-radius: 50%; transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+            pointer-events: none; opacity: 0; z-index: 0;
+        }
+        .glow-btn:hover::before { width: 250px; height: 250px; opacity: 0.3; }
+        .glow-btn > * { position: relative; z-index: 1; }
+
+        /* Pro Plan Card */
+        .creator-pro-card { background: #9c7ead; position: relative; }
+        .creator-pro-card .content-wrapper { background-color: var(--card-dark); transition: background-color 0.3s ease; }
+        .creator-pro-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 0 40px rgba(156, 126, 173, 0.4); }
+        .creator-pro-card::after {
+            content: ''; position: absolute; inset: -5px; background: #9c7ead;
+            filter: blur(25px); z-index: -1; opacity: 0.5; transition: opacity 0.3s ease;
+        }
+        .creator-pro-card:hover::after { opacity: 0.7; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #232323; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--brand-blue); }
+
+        /* Background Blob Animation */
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob { animation: blob 7s infinite; }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
+
+        /* Hero Background Effects */
+        #hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at bottom, #1d1624 0%, #090a0f 100%); opacity: 0.6; z-index: 0; }
+        #hero::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 150px; background: linear-gradient(to top, #000 10%, transparent); z-index: 1; }
+        .noise-bg { position: absolute; inset: 0; width: 100%; height: 100%; background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAUVBMVEWFhYWDg4N3d3dtbW17e3t1dXVuZmaDg4OGhoaFhYWDg4N3d3dtbW17e3t1dXVuZmaDg4OGhoaFhYWDg4N3d3dtbW17e3t1dXVuZmaDg4OGhoaFhYWDg4N3d3d2SyPTAAAAH3RSTlMAAQIFBw0OMxISNTEgJicnJyoqLS0tLzAxMjIyNzg5Pj9DMiO+AAAAPklEQVRIx2MCRQcJDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8MDABr2w38lM0X5gAAAABJRU5ErkJggg==); z-index: 2; opacity: 0.04; pointer-events: none; }
+        .night, .particle-wrapper { position: absolute; width: 100%; height: 100%; overflow: hidden; z-index: 0; }
+        .shooting_star { position: absolute; height: var(--star-height, 2px); border-radius: 999px; animation-name: tail, shooting; animation-timing-function: linear; animation-iteration-count: 1; animation-fill-mode: forwards; opacity: 0.80; }
+        .particle-wrapper .particle, .particle-container .particle { position: absolute; border-radius: 50%; background: rgba(156, 126, 173, 0.5); animation: float-from-bottom linear infinite; pointer-events: none; }
+        .shooting_star::before, .shooting_star::after { content: ''; position: absolute; top: calc(50% - (var(--star-height, 2px) / 2)); right: 0; height: var(--star-height, 2px); border-radius: 100%; animation: shining inherit 1 forwards; }
+        .shooting_star::after { transform: translateX(50%) rotateZ(-45deg); }
+        .shooting_star::before { transform: translateX(50%) rotateZ(45deg); }
+        .shooting_star { background: linear-gradient(-45deg, #9c7ead, rgba(156, 126, 173, 0)); filter: drop-shadow(0 0 6px #9c7ead); }
+        .shooting_star::before, .shooting_star::after { background: linear-gradient(-45deg, rgba(156, 126, 173, 0), #9c7ead, rgba(156, 126, 173, 0)); }
+        @keyframes tail { 0% { width: 0; } 20%, 80% { width: var(--star-tail-length, 150px); } 100% { width: 0; } }
+        @keyframes shining { 0% { width: 0; } 20%, 80% { width: var(--star-head-size, 30px); } 100% { width: 0; } }
+        @keyframes shooting { 0% { transform: rotate(var(--star-rotation)) translateX(0); } 100% { transform: rotate(var(--star-rotation)) translateX(2500px); } }
+        @keyframes float-from-bottom { to { transform: translateY(-110vh) translateX(-10vw); opacity: 0; } }
+
+        /* Header & Nav */
+        header nav { transition: padding 0.3s ease-in-out; padding-top: 1.5rem; padding-bottom: 1.5rem; }
+        header.header-scrolled nav { padding-top: 1rem; padding-bottom: 1rem; }
+        .header .header-cta { background-color: #9c7ead; color: #fff; }
+        
+        /* Logo Star Icon */
+        .logo-icon { position: relative; width: 1em; height: 1em; filter: drop-shadow(0 0 6px #9c7ead); }
+        .logo-icon-ray { position: absolute; top: 50%; left: 50%; width: 100%; height: 2px; background: linear-gradient(to right, rgba(156, 126, 173, 0), #9c7ead, rgba(156, 126, 173, 0)); transform-origin: center; }
+        .logo-icon-ray:first-child { transform: translate(-50%, -50%) rotate(45deg); }
+        .logo-icon-ray:last-child { transform: translate(-50%, -50%) rotate(-45deg); }
+
+        /* FAQ Section */
+        .faq-item .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-in-out;
+        }
+        .faq-item.active .faq-answer {
+            max-height: 20rem; /* 320px */
+        }
+        .faq-item .faq-icon { transition: transform 0.3s ease-in-out; color: var(--brand-blue); }
+        .faq-item.active .faq-icon { transform: rotate(45deg); }
+        .faq-item button h3 { color: var(--text-p-dark); transition: color 0.3s ease; }
+        .faq-item button:hover h3 { color: white; }
+        .faq-item .particle-container .particle, .pricing-card .particle-container .particle { background: rgba(156, 126, 173, 0.3); } /* Dimmer particles */
+        
+        /* Testimonials */
+        .scroller {
+            -webkit-mask: linear-gradient(90deg, transparent, white 20%, white 80%, transparent);
+            mask: linear-gradient(90deg, transparent, white 20%, white 80%, transparent);
+        }
+        .scroller__inner {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 1.5rem; /* space-x-6 */
+            width: max-content;
+        }
+        .scroller[data-animated="true"] {
+            overflow: hidden;
+        }
+        .scroller[data-animated="true"] .scroller__inner {
+            animation: scroll linear infinite;
+            animation-duration: var(--_animation-duration, 40s);
+            animation-direction: var(--_animation-direction, forwards);
+        }
+
+        @keyframes scroll {
+          to {
+            transform: translate(calc(-50% - 0.75rem));
+          }
+        }
+
+        /* Scroll Animations */
+        .fade-in-section { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+        .fade-in-section.is-visible { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+    
+    <header class="header fixed top-0 left-0 w-full z-50 backdrop-blur-md transition-colors duration-300">
+        <nav class="container mx-auto px-6 flex justify-between items-center">
+            <div class="flex-1 flex justify-start">
+                <a href="#" class="text-2xl font-bold logo-text flex items-center gap-2">
+                    <div class="logo-icon"><span class="logo-icon-ray"></span><span class="logo-icon-ray"></span></div>
+                    <span>Stella.</span>
+                </a>
+            </div>
+            <div class="hidden md:flex justify-center items-center space-x-8">
+                <div class="relative group" x-data="{ open: false, activeCategory: 'brand' }" @mouseenter="open = true" @mouseleave="open = false">
+                    <a href="#features" class="nav-link text-white hover:text-gray-300 transition-colors font-medium flex items-center">
+                        Toolkit
+                        <svg class="w-4 h-4 ml-1 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </a>
+                    <div x-show="open" x-transition:enter="transition ease-out duration-200" 
+                         x-transition:enter-start="opacity-0 translate-y-1" 
+                         x-transition:enter-end="opacity-100 translate-y-0" 
+                         x-transition:leave="transition ease-in duration-150" 
+                         x-transition:leave-start="opacity-100 translate-y-0" 
+                         x-transition:leave-end="opacity-0 translate-y-1"
+                         class="absolute left-1/2 -translate-x-1/2 mt-4 w-[500px] bg-[var(--card-dark)] border border-[var(--border-dark)] rounded-xl shadow-lg z-50 text-white"
+                         @mouseenter="open = true" @mouseleave="open = false" style="display: none;">
+                        <div class="grid grid-cols-3">
+                            <div class="col-span-1 bg-black/20 p-4 rounded-l-xl">
+                                <h3 class="font-medium text-[#9c7ead] mb-3">Categories</h3>
+                                <ul class="space-y-2">
+                                    <li><button @mouseenter="activeCategory = 'brand'" :class="{ 'text-[var(--brand-blue)] bg-white/10 shadow-sm': activeCategory === 'brand'}" class="w-full text-left px-3 py-2 rounded-md font-medium hover:bg-white/5 transition-colors">Brand</button></li>
+                                    <li><button @mouseenter="activeCategory = 'content'" :class="{ 'text-[var(--brand-blue)] bg-white/10 shadow-sm': activeCategory === 'content'}" class="w-full text-left px-3 py-2 rounded-md font-medium hover:bg-white/5 transition-colors">Content</button></li>
+                                </ul>
+                            </div>
+                            <div class="col-span-2 p-4">
+                                <div x-show="activeCategory === 'brand'" class="space-y-3">
+                                    <h4 class="font-medium text-[var(--text-title-dark)] mb-2">Brand Tools</h4>
+                                    <a href="#features" class="block p-2 rounded-md hover:bg-white/5 transition-colors"><p class="font-medium">Brand Kits</p><p class="text-sm text-[var(--text-p-dark)]">Centralize your brand assets.</p></a>
+                                    <a href="#asset-hub" class="block p-2 rounded-md hover:bg-white/5 transition-colors"><p class="font-medium">Asset Hub</p><p class="text-sm text-[var(--text-p-dark)]">Your single source of truth.</p></a>
+                                </div>
+                                <div x-show="activeCategory === 'content'" class="space-y-3" style="display: none;">
+                                     <h4 class="font-medium text-[var(--text-title-dark)] mb-2">Content Tools</h4>
+                                    <a href="#governance" class="block p-2 rounded-md hover:bg-white/5 transition-colors"><p class="font-medium">AI Governance</p><p class="text-sm text-[var(--text-p-dark)]">Ensure brand compliance.</p></a>
+                                    <a href="#automation" class="block p-2 rounded-md hover:bg-white/5 transition-colors"><p class="font-medium">Automation</p><p class="text-sm text-[var(--text-p-dark)]">Accelerate your workflows.</p></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a href="#governance" class="hover:text-white transition-colors duration-300">Governance</a>
+                <a href="#automation" class="hover:text-white transition-colors duration-300">Automation</a>
+                <a href="#pricing" class="hover:text-white transition-colors duration-300">Pricing</a>
+            </div>
+            <div class="flex-1 flex justify-end items-center space-x-2">
+                <button id="login-btn" class="glow-btn main-button hidden sm:inline-block border px-4 py-2 rounded-full font-medium text-sm">Log In</button>
+                <button id="signup-btn" class="glow-btn special-button px-4 py-2 rounded-full font-medium text-sm header-cta">Get Started</button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero" class="h-screen relative flex items-center justify-center text-center overflow-hidden">
+             <div class="particle-wrapper"></div>
+             <div class="night"></div>
+             <div class="noise-bg"></div>
+            <div class="relative z-20 container mx-auto px-6">
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[68vw] md:w-[680px] h-[340px] bg-[#9c7ead] opacity-30 rounded-full [filter:blur(200px)] -z-10"></div>
+                <div class="max-w-4xl mx-auto">
+                    <h1 class="text-5xl md:text-7xl font-bold tracking-tighter leading-tight hero-title">
+                        Let's make your brand, unified. instantly.
+                    </h1>
+                    <p class="mt-6 max-w-2xl mx-auto text-lg md:text-xl hero-subtitle">
+                        Stella is the complete brand kit and governance platform. Ensure every logo, color, and sentence aligns perfectly with your brand identity, powered by AI.
+                    </p>
+                    <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 hero-buttons">
+                        <button id="hero-signup-btn" class="glow-btn special-button w-full sm:w-auto px-8 py-3 rounded-full font-semibold shadow-2xl shadow-black/20">
+                            Start for Free
+                        </button>
+                        <a href="#pricing" class="glow-btn main-button w-full sm:w-auto border px-8 py-3 rounded-full font-semibold shadow-2xl shadow-black/20">
+                            Request a Demo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="integrations" class="py-16 relative fade-in-section">
+            <div class="container mx-auto px-6 relative z-10">
+                <div class="text-center">
+                    <h2 class="text-2xl font-bold">Integrates Seamlessly</h2>
+                    <p class="mt-2 text-base">Connect Stella to your favorite tools.</p>
+                    <div class="mt-12 flex flex-wrap justify-center items-center gap-x-8 gap-y-6 md:gap-x-12">
+                        <div class="integration-logo flex items-center gap-3 text-2xl font-semibold opacity-70"><img src="https://www.vectorlogo.zone/logos/google/google-icon.svg" class="h-8" alt="Google"> Google</div>
+                        <div class="integration-logo flex items-center gap-3 text-2xl font-semibold opacity-70"><img src="https://www.notion.so/front-static/favicon.ico" class="h-8" alt="Notion"> Notion</div>
+                        <div class="integration-logo flex items-center gap-3 text-2xl font-semibold opacity-70"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Meta_Platforms_logo.svg/640px-Meta_Platforms_logo.svg.png" class="h-7" alt="Meta"> Meta</div>
+                        <div class="integration-logo flex items-center gap-3 text-2xl font-semibold opacity-70"><img src="https://www.vectorlogo.zone/logos/github/github-icon.svg" class="h-8" alt="GitHub"> GitHub</div>
+                        <div class="integration-logo flex items-center gap-3 text-2xl font-semibold opacity-70"><img src="https://www.vectorlogo.zone/logos/figma/figma-icon.svg" class="h-8" alt="Figma"> Figma</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="py-24 relative fade-in-section">
+            <div class="container mx-auto px-6 relative z-10">
+                <div class="text-center mb-16">
+                    <div class="flex justify-center mb-4">
+                        <svg class="w-12 h-12 text-[var(--brand-blue)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" /></svg>
+                    </div>
+                    <h2 class="text-4xl md:text-5xl font-bold tracking-tighter">The Complete Brand Toolkit</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg">Everything you need to build, manage, and scale your brand with absolute consistency and powerful automation.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="main-card border p-6 rounded-2xl flex flex-col"><div class="flex justify-between items-start mb-4"><h3 class="text-xl font-semibold text-left pr-4">Brand Kits</h3><div class="w-12 h-12 rounded-lg bg-[#9c7ead]/10 flex items-center justify-center border border-[#9c7ead]/20 flex-shrink-0"><svg class="w-6 h-6 text-[#9c7ead]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m-16 0c0 2.21 3.582 4 8 4s8-1.79 8-4"></path></svg></div></div><p class="flex-grow">Establish and maintain a consistent brand identity with a centralized hub for all your essential assets. From logos and color palettes to typography and usage guidelines, ensure everyone has access to the correct versions, always.</p></div>
+                    <div class="main-card border p-6 rounded-2xl flex flex-col"><div class="flex justify-between items-start mb-4"><h3 class="text-xl font-semibold text-left pr-4">Team Spaces</h3><div class="w-12 h-12 rounded-lg bg-[#9c7ead]/10 flex items-center justify-center border border-[#9c7ead]/20 flex-shrink-0"><svg class="w-6 h-6 text-[#9c7ead]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></div></div><p class="flex-grow">Collaborate securely with dedicated spaces for your team. Set granular, role-based permissions to control who can view, edit, and approve brand assets, streamlining your workflow without compromising security.</p></div>
+                    <div class="main-card border p-6 rounded-2xl flex flex-col"><div class="flex justify-between items-start mb-4"><h3 class="text-xl font-semibold text-left pr-4">Compliance</h3><div class="w-12 h-12 rounded-lg bg-[#9c7ead]/10 flex items-center justify-center border border-[#9c7ead]/20 flex-shrink-0"><svg class="w-6 h-6 text-[#9c7ead]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg></div></div><p class="flex-grow">Operate with confidence knowing your brand assets are protected by enterprise-grade security. Stella ensures full compliance with GDPR and CCPA, keeping your data safe and your brand secure.</p></div>
+                    <div class="main-card border p-6 rounded-2xl flex flex-col"><div class="flex justify-between items-start mb-4"><h3 class="text-xl font-semibold text-left pr-4">Analytics</h3><div class="w-12 h-12 rounded-lg bg-[#9c7ead]/10 flex items-center justify-center border border-[#9c7ead]/20 flex-shrink-0"><svg class="w-6 h-6 text-[#9c7ead]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg></div></div><p class="flex-grow">Gain valuable insights into how your brand assets are being used. Track downloads, shares, and content performance across all channels to make informed, data-driven decisions that strengthen your brand's impact.</p></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="asset-hub" class="py-24 relative fade-in-section">
+            <div class="container mx-auto px-6"><div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+                <div class="lg:w-1/2">
+                    <div class="inline-flex items-center gap-3 bg-white/5 px-4 py-2 rounded-full border border-white/10 mb-6"><svg class="w-5 h-5 text-[var(--brand-blue)]" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9.776c.112-.017.227-.026.344-.026h15.812c.117 0 .232.009.344.026m-16.5 0a2.25 2.25 0 00-1.883 2.542l.857 6a2.25 2.25 0 002.227 1.932H19.05a2.25 2.25 0 002.227-1.932l.857-6a2.25 2.25 0 00-1.883-2.542m-16.5 0A2.25 2.25 0 015.625 7.5h12.75c1.135 0 2.098.79 2.231 1.873m-16.5 0v2.25c0 .621.504 1.125 1.125 1.125h14.25c.621 0 1.125-.504 1.125-1.125V9.776" /></svg><span class="font-medium text-sm text-white/80">Centralized Asset Hub</span></div>
+                    <h2 class="text-4xl md:text-5xl font-bold tracking-tighter leading-tight">Your Single Source of Truth</h2>
+                    <p class="mt-6 text-lg">Effortlessly organize, access, and distribute all your brand assets from one secure, centralized library. Say goodbye to outdated files and inconsistent branding forever.</p>
+                    <ul class="mt-6 space-y-3 text-lg"><li class="flex items-center"><span class="text-[var(--brand-blue)] mr-3 font-bold">✓</span> Real-Time Version Control</li><li class="flex items-center"><span class="text-[var(--brand-blue)] mr-3 font-bold">✓</span> AI-Powered Smart Tagging</li><li class="flex items-center"><span class="text-[var(--brand-blue)] mr-3 font-bold">✓</span> Granular Access Permissions</li></ul>
+                </div>
+                <div class="lg:w-1/2 w-full"><img src="ui/img/super.avif" alt="Stella Asset Hub UI" class="rounded-xl border border-[var(--border-dark)] shadow-2xl shadow-black/30 w-full h-auto"></div>
+            </div></div>
+        </section>
+
+        <section id="governance" class="py-24 relative overflow-hidden fade-in-section">
+             <div class="absolute inset-0 z-0 [mask-image:linear-gradient(to_bottom,transparent_0%,black_20%,black_80%,transparent_100%)]"><div class="absolute -top-1/4 left-1/4 w-[500px] h-[500px] bg-[#9c7ead]/40 rounded-full filter blur-3xl opacity-30 animate-blob"></div><div class="absolute top-1/4 right-1/4 w-[500px] h-[500px] bg-[#9c7ead]/40 rounded-full filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div><div class="absolute bottom-0 left-1/3 w-[500px] h-[500px] bg-[#9c7ead]/40 rounded-full filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div></div>
+            <div class="container mx-auto px-6 relative z-10"><div class="flex flex-col lg:flex-row-reverse items-center gap-12">
+                <div class="lg:w-1/2">
+                    <div class="inline-flex items-center gap-3 bg-white/5 px-4 py-2 rounded-full border border-white/10 mb-6"><svg class="w-5 h-5 text-[var(--brand-blue)]" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.6-3.752A11.959 11.959 0 0112 2.75c-2.176 0-4.205.56-5.902 1.516z" /></svg><span class="font-medium text-sm text-white/80">AI Governance</span></div>
+                    <h2 class="text-4xl md:text-5xl font-bold tracking-tighter leading-tight">AI-Powered Brand & Content Governance</h2>
+                    <p class="mt-6 text-lg">Stella's real-time NLP engine ensures every piece of content aligns with your brand voice, style, and compliance standards, before it ever gets published.</p>
+                    <ul class="mt-6 space-y-3 font-geist-mono text-lg"><li class="flex items-center"><span class="text-[var(--brand-blue)] mr-3 font-bold">✓</span> Tone & Voice Analysis</li><li class="flex items-center"><span class="text-[var(--brand-blue)] mr-3 font-bold">✓</span> Style Guide Enforcement</li><li class="flex items-center"><span class="text-[var(--brand-blue)] mr-3 font-bold">✓</span> Compliance & Legal Checks</li></ul>
+                </div>
+                <div class="lg:w-1/2 w-full h-auto bg-black/50 backdrop-blur-sm rounded-xl border border-white/10 p-4 font-geist-mono text-sm"><div class="flex items-center gap-2 border-b border-white/10 pb-2 mb-3"><span class="w-3 h-3 bg-red-500 rounded-full"></span><span class="w-3 h-3 bg-yellow-500 rounded-full"></span><span class="w-3 h-3 bg-green-500 rounded-full"></span><span class="text-white/50 ml-auto">stella_ai_analysis.log</span></div><div class="space-y-2 text-white/80"><p>> stella --scan document.docx</p><p class="text-white/50">Analysis in progress...</p><div class="flex items-center gap-3 pt-2"><span>Tone & Voice... <span class="text-[var(--brand-blue)] font-semibold">MATCHED</span></span></div><div class="flex items-center gap-3"><span>Style Guide... <span class="text-[var(--brand-blue)] font-semibold">PASSED</span></span></div><div class="flex items-center gap-3"><span>Compliance... <span class="text-[var(--brand-blue)] font-semibold">0 FLAGS</span></span></div><p class="pt-2 text-white/50">Analysis complete.</p></div></div>
+            </div></div>
+        </section>
+
+        <section id="automation" class="py-24 relative fade-in-section">
+            <div class="container mx-auto px-6"><div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+                <div class="lg:w-1/2">
+                    <div class="inline-flex items-center gap-3 bg-white/5 px-4 py-2 rounded-full border border-white/10 mb-6"><svg class="w-5 h-5 text-[var(--brand-blue)]" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg><span class="font-medium text-sm text-white/80">Workflow Automation</span></div>
+                    <h2 class="text-4xl md:text-5xl font-bold tracking-tighter leading-tight">Connect, Automate, & Accelerate</h2>
+                    <p class="mt-6 text-lg">Integrate Stella directly into your existing tools to automate asset syncing, content approvals, and brand checks. Free up your team to focus on creativity, not compliance.</p>
+                    <ul class="mt-6 space-y-3 text-lg"><li class="flex items-center"><span class="text-[var(--brand-blue)] mr-3 font-bold">✓</span> Figma & Adobe CC Plugins</li><li class="flex items-center"><span class="text-[var(--brand-blue)] mr-3 font-bold">✓</span> Slack & MS Teams Notifications</li><li class="flex items-center"><span class="text-[var(--brand-blue)] mr-3 font-bold">✓</span> Custom API & Webhooks</li></ul>
+                </div>
+                <div class="lg:w-1/2 w-full"><img src="ui/img/super.avif" alt="Stella UI Screenshot" class="rounded-xl border border-[var(--border-dark)] shadow-2xl shadow-black/30 w-full h-auto"></div>
+            </div></div>
+        </section>
+
+        <section id="testimonials" class="py-24 relative overflow-hidden fade-in-section">
+            <div class="container mx-auto px-6 relative z-10 text-center mb-16">
+                <div class="flex justify-center mb-4"><svg class="w-12 h-12 text-[#9c7ead]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m-7.5-2.28a4.5 4.5 0 00-1.897 1.13l-2.685 2.685a3.75 3.75 0 000 5.304l.943.943a3.75 3.75 0 005.304 0l2.685-2.685a4.5 4.5 0 001.13-1.897M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg></div>
+                <h2 class="text-4xl md:text-5xl font-bold tracking-tighter">Trusted by the World's Best Teams</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-300">See how leading brands are using Stella to build stronger, more consistent identities.</p>
+            </div>
+            
+            <div class="flex flex-col gap-6">
+                <div class="scroller" data-animated="true" data-direction="left" style="--_animation-duration: 50s;">
+                    <div class="scroller__inner">
+                        <div class="testimonial-card border border-white/10 p-8 rounded-2xl w-80 flex-shrink-0 bg-[#111] text-left"><p class="text-lg mb-6">"Stella has been a game-changer for our content pipeline. The AI governance ensures every piece of content is perfectly on-brand."</p><div class="flex items-center border-t border-white/10 pt-4"><svg class="testimonial-logo h-8 w-auto mr-4 text-white" viewBox="0 0 100 100" fill="currentColor"><path d="M50 0L61.2 38.8L100 50L61.2 61.2L50 100L38.8 61.2L0 50L38.8 38.8L50 0Z" /></svg><div><p class="font-bold text-white">Sarah Johnson</p><p class="text-sm text-gray-400">Head of Content, QuantumLeap</p></div></div></div>
+                        <div class="testimonial-card border border-white/10 p-8 rounded-2xl w-80 flex-shrink-0 bg-[#111] text-left"><p class="text-lg mb-6">"Our distributed team is always in sync, using the correct assets. It's the foundation of our brand ops."</p><div class="flex items-center border-t border-white/10 pt-4"><svg class="testimonial-logo h-8 w-auto mr-4 text-white" viewBox="0 0 100 100" fill="currentColor"><path d="M0 0H50V50H0V0ZM50 50H100V100H50V50Z" /></svg><div><p class="font-bold text-white">Emily Rodriguez</p><p class="text-sm text-gray-400">Brand Manager, Pioneer Digital</p></div></div></div>
+                        <div class="testimonial-card border border-white/10 p-8 rounded-2xl w-80 flex-shrink-0 bg-[#111] text-left"><p class="text-lg mb-6">"We've never had this level of brand consistency before — Stella made it effortless."</p><div class="flex items-center border-t border-white/10 pt-4"><svg class="testimonial-logo h-8 w-auto mr-4 text-white" viewBox="0 0 100 100" fill="currentColor"><path d="M50 0L100 100H0L50 0Z" /></svg><div><p class="font-bold text-white">Ava Patel</p><p class="text-sm text-gray-400">Marketing Lead, NextGen Labs</p></div></div></div>
+                        <div class="testimonial-card border border-white/10 p-8 rounded-2xl w-80 flex-shrink-0 bg-[#111] text-left"><p class="text-lg mb-6">"The automation has saved us thousands of hours and kept every touchpoint on-brand."</p><div class="flex items-center border-t border-white/10 pt-4"><svg class="testimonial-logo h-8 w-auto mr-4 text-white" viewBox="0 0 100 100" fill="currentColor"><circle cx="50" cy="50" r="50" /></svg><div><p class="font-bold text-white">James Turner</p><p class="text-sm text-gray-400">Operations, Skylark Studio</p></div></div></div>
+                    </div>
+                </div>
+                 <div class="scroller" data-animated="true" data-direction="right" style="--_animation-duration: 60s;">
+                    <div class="scroller__inner">
+                        <div class="testimonial-card border border-white/10 p-8 rounded-2xl w-80 flex-shrink-0 bg-[#111] text-left"><p class="text-lg mb-6">"Stella centralized everything and gave us the tools to scale without compromise."</p><div class="flex items-center border-t border-white/10 pt-4"><svg class="testimonial-logo h-8 w-auto mr-4 text-white" viewBox="0 0 100 100" fill="currentColor"><circle cx="50" cy="50" r="50" /><circle cx="50" cy="50" r="25" fill="#0A0A0A" /></svg><div><p class="font-bold text-white">Michael Chen</p><p class="text-sm text-gray-400">Creative Director, Nova Creative</p></div></div></div>
+                        <div class="testimonial-card border border-white/10 p-8 rounded-2xl w-80 flex-shrink-0 bg-[#111] text-left"><p class="text-lg mb-6">"The single source of truth for assets is invaluable. No more hunting for the right logo!"</p><div class="flex items-center border-t border-white/10 pt-4"><svg class="testimonial-logo h-8 w-auto mr-4 text-white" viewBox="0 0 100 100" fill="currentColor"><rect width="100" height="100" /></svg><div><p class="font-bold text-white">David Lee</p><p class="text-sm text-gray-400">Founder, Orbit Inc.</p></div></div></div>
+                        <div class="testimonial-card border border-white/10 p-8 rounded-2xl w-80 flex-shrink-0 bg-[#111] text-left"><p class="text-lg mb-6">"Onboarding new team members is so much faster now that our brand guidelines are interactive and accessible."</p><div class="flex items-center border-t border-white/10 pt-4"><svg class="testimonial-logo h-8 w-auto mr-4 text-white" viewBox="0 0 100 100" fill="currentColor"><path d="M0 50L50 100L100 50L50 0L0 50Z" /></svg><div><p class="font-bold text-white">Olivia Garcia</p><p class="text-sm text-gray-400">HR Manager, Fusion Co.</p></div></div></div>
+                        <div class="testimonial-card border border-white/10 p-8 rounded-2xl w-80 flex-shrink-0 bg-[#111] text-left"><p class="text-lg mb-6">"The analytics provide real insight into how our brand is being perceived and used."</p><div class="flex items-center border-t border-white/10 pt-4"><svg class="testimonial-logo h-8 w-auto mr-4 text-white" viewBox="0 0 100 100" fill="currentColor"><path d="M20 0L0 20L20 40L40 20L20 0ZM80 60L60 80L80 100L100 80L80 60Z" /></svg><div><p class="font-bold text-white">Ben Carter</p><p class="text-sm text-gray-400">Data Analyst, Apex Solutions</p></div></div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="pricing" class="py-24 relative fade-in-section">
+            <div class="container mx-auto px-6 relative z-10">
+                <div class="text-center mb-16">
+                    <div class="flex justify-center mb-4"><svg class="w-12 h-12 text-[var(--brand-blue)]" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+                    <h2 class="text-4xl md:text-5xl font-bold tracking-tighter">Pricing that Scales with You</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg">From individual creators to global enterprises, there's a Stella plan for you.</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch max-w-4xl mx-auto">
+                    <div class="main-card border p-8 rounded-2xl h-full flex flex-col relative pricing-card">
+                        <div class="particle-container absolute inset-0 w-full h-full overflow-hidden rounded-2xl pointer-events-none z-0"></div>
+                        <div class="relative z-10 flex flex-col h-full">
+                            <h3 class="text-xl font-bold text-center">Free Trial</h3>
+                            <p class="text-center mt-2">Perfect for getting started with Stella.</p>
+                            <p class="text-5xl font-bold mt-6 text-center">$0<span class="text-lg font-normal opacity-70"> / month</span></p>
+                            <ul class="space-y-4 mt-8 flex-grow">
+                                <li class="flex items-start"><span class="text-[var(--brand-blue)] mr-3 mt-1">✓</span> 5 Brand Kits</li>
+                                <li class="flex items-start"><span class="text-[var(--brand-blue)] mr-3 mt-1">✓</span> 2 Team Members</li>
+                                <li class="flex items-start"><span class="text-[var(--brand-blue)] mr-3 mt-1">✓</span> 5GB Storage</li>
+                                <li class="flex items-start"><span class="text-[var(--brand-blue)] mr-3 mt-1">✓</span> Basic Support</li>
+                                <li class="flex items-start"><span class="text-[var(--brand-blue)] mr-3 mt-1">✓</span> No credit card required</li>
+                            </ul>
+                            <button class="signup-cta-btn glow-btn special-button w-full mt-8 block text-center px-6 py-3 rounded-full font-semibold">Get Started Free</button>
+                        </div>
+                    </div>
+                    <div class="creator-pro-card p-1.5 rounded-2xl relative transition-all duration-300 pricing-card">
+                        <div class="particle-container absolute inset-0 w-full h-full overflow-hidden rounded-2xl pointer-events-none z-0"></div>
+                        <div class="content-wrapper rounded-[10px] p-8 h-full flex flex-col relative z-10">
+                            <div class="absolute top-4 right-4">
+                                <span class="bg-[#9c7ead] text-white text-xs font-bold px-2 py-1 rounded-full">POPULAR</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-center">Pro</h3>
+                            <p class="text-center mt-2">For growing teams and businesses.</p>
+                            <p class="text-5xl font-bold mt-6 text-center">$15<span class="text-lg font-normal opacity-70"> / month</span></p>
+                            <ul class="space-y-4 mt-8 flex-grow">
+                                <li class="flex items-start"><span class="text-[var(--brand-blue)] mr-3 mt-1">✓</span> Unlimited Brand Kits</li>
+                                <li class="flex items-start"><span class="text-[var(--brand-blue)] mr-3 mt-1">✓</span> 10 Team Members</li>
+                                <li class="flex items-start"><span class="text-[var(--brand-blue)] mr-3 mt-1">✓</span> 10GB Storage</li>
+                                <li class="flex items-start"><span class="text-[var(--brand-blue)] mr-3 mt-1">✓</span> Priority Support</li>
+                                <li class="flex items-start"><span class="text-[var(--brand-blue)] mr-3 mt-1">✓</span> Advanced Analytics</li>
+                            </ul>
+                            <button class="signup-cta-btn glow-btn bg-[#9c7ead] text-white w-full mt-8 block text-center px-6 py-3 rounded-full font-semibold" onclick="redirectToSignup('pro')">Upgrade to Pro</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="faq" class="py-24 relative fade-in-section">
+            <div class="container mx-auto px-6 relative z-10">
+                <div class="text-center mb-16">
+                    <div class="flex justify-center mb-4"><svg class="w-12 h-12 text-[var(--brand-blue)]" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" /></svg></div>
+                    <h2 class="text-4xl md:text-5xl font-bold tracking-tighter">Frequently Asked Questions</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg">Have questions? We've got answers.</p>
+                </div>
+                <div class="max-w-4xl mx-auto">
+                    <div class="space-y-4">
+                        <div class="faq-item main-card border rounded-xl overflow-hidden relative"><div class="particle-container absolute inset-0 w-full h-full overflow-hidden rounded-xl pointer-events-none z-0"></div><button class="relative z-10 w-full flex justify-between items-center text-left p-6"><h3 class="font-bold text-lg">Is Stella suitable for solo creators?</h3><svg class="faq-icon w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg></button><div class="faq-answer relative z-10"><div class="px-6 pb-6 pt-0"><p>Absolutely! Our Free and Creator Pro plans are designed specifically for individual creators, freelancers, and small businesses to manage their brand assets and maintain consistency.</p></div></div></div>
+                        <div class="faq-item main-card border rounded-xl overflow-hidden relative"><div class="particle-container absolute inset-0 w-full h-full overflow-hidden rounded-xl pointer-events-none z-0"></div><button class="relative z-10 w-full flex justify-between items-center text-left p-6"><h3 class="font-bold text-lg">What kind of support do you offer?</h3><svg class="faq-icon w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg></button><div class="faq-answer relative z-10"><div class="px-6 pb-6 pt-0"><p>We offer email support for all plans. Creator Pro plans include priority email support, and our Business plan comes with a dedicated account manager and tailored onboarding assistance.</p></div></div></div>
+                        <div class="faq-item main-card border rounded-xl overflow-hidden relative"><div class="particle-container absolute inset-0 w-full h-full overflow-hidden rounded-xl pointer-events-none z-0"></div><button class="relative z-10 w-full flex justify-between items-center text-left p-6"><h3 class="font-bold text-lg">Can I cancel my subscription at any time?</h3><svg class="faq-icon w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg></button><div class="faq-answer relative z-10"><div class="px-6 pb-6 pt-0"><p>Yes, you can cancel your subscription at any time. If you cancel, you will retain access to your plan's features until the end of your current billing cycle. We don't believe in lock-in contracts.</p></div></div></div>
+                        <div class="faq-item main-card border rounded-xl overflow-hidden relative"><div class="particle-container absolute inset-0 w-full h-full overflow-hidden rounded-xl pointer-events-none z-0"></div><button class="relative z-10 w-full flex justify-between items-center text-left p-6"><h3 class="font-bold text-lg">How does the AI governance work?</h3><svg class="faq-icon w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg></button><div class="faq-answer relative z-10"><div class="px-6 pb-6 pt-0"><p>Our AI analyzes your text-based content against the rules you define in your Brand Kit. It checks for tone, style, terminology, and legal disclaimers in real-time, flagging any content that deviates from your brand identity.</p></div></div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-black border-t border-[var(--border-dark)] text-[var(--text-p-dark)]">
+        <div class="container mx-auto px-6 py-16">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12 text-center md:text-left">
+                <div class="flex flex-col items-center md:items-start md:col-span-2 lg:col-span-2">
+                     <a href="#" class="text-2xl font-bold logo-text flex items-center gap-2 mb-4">
+                         <div class="logo-icon text-2xl"><span class="logo-icon-ray"></span><span class="logo-icon-ray"></span></div>
+                         <span>Stella.</span>
+                     </a>
+                    <p class="text-sm">Your Brand, Unified. Instantly.</p>
+                    <div class="mt-6 flex flex-col sm:flex-row items-center md:items-start gap-6 text-sm">
+                        <div class="flex items-center gap-2">
+                            <img src="ui/img/gdpr.png" alt="GDPR Compliance Badge" class="h-10">
+                            <span>GDPR<br>Compliant</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <img src="ui/img/pipeda.svg" alt="PIPEDA Compliance Badge" class="h-10">
+                            <span>PIPEDA<br>Compliant</span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-[#9c7ead] mb-3">Blacnova</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#faq" class="hover:text-white">Cookies</a></li>
+                        <li><a href="#faq" class="hover:text-white">Terms</a></li>
+                        <li><a href="#faq" class="hover:text-white">Policy</a></li>
+                        <li><a href="#faq" class="hover:text-white">Contact us</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-[#9c7ead] mb-3">Product</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#features" class="hover:text-white">Features</a></li>
+                        <li><a href="#governance" class="hover:text-white">Governance</a></li>
+                        <li><a href="#automation" class="hover:text-white">Automation</a></li>
+                        <li><a href="#pricing" class="hover:text-white">Pricing</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-[#9c7ead] mb-3">Toolkit</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#features" class="hover:text-white">Brand Kits</a></li>
+                        <li><a href="#asset-hub" class="hover:text-white">Asset Hub</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-[#9c7ead] mb-3">Resources</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#features" class="hover:text-white">For Creators</a></li>
+                        <li><a href="#asset-hub" class="hover:text-white">For Businesses</a></li>
+                        <li><a href="#faq" class="hover:text-white">Contact Us</a></li>
+                        <li><a href="#pricing" class="hover:text-white">Request a Demo</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-16 text-center">
+                <div class="flex justify-center space-x-6 mb-6">
+                    <a href="#" aria-label="Twitter" class="hover:text-white"><i class="fa-brands fa-x-twitter text-xl"></i></a>
+                    <a href="#" aria-label="LinkedIn" class="hover:text-white"><i class="fa-brands fa-linkedin text-xl"></i></a>
+                    <a href="#" aria-label="GitHub" class="hover:text-white"><i class="fa-brands fa-github text-xl"></i></a>
+                </div>
+                <p class="text-sm">© 2025 Stella AI, Inc. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); z-index: 9999; backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s ease; overflow-y: auto;">
+        <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; width: 100%; padding: 40px 20px; box-sizing: border-box;">
+            <div id="auth-content" style="background: #111; padding: 2.5rem; border-radius: 24px; width: 100%; max-width: 440px; border: 1px solid #232323; box-shadow: 0 20px 60px rgba(0,0,0,0.8); position: relative;">
+                <button id="close-auth-modal" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: #888; font-size: 1.5rem; cursor: pointer; transition: color 0.2s; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">&times;</button>
+                
+                <!-- Login Form -->
+                <div id="login-form-container">
+                    <div style="text-align: center; margin-bottom: 2rem;">
+                        <div class="logo-icon" style="font-size: 3rem; margin: 0 auto 1rem; display: inline-block;">
+                            <span class="logo-icon-ray"></span>
+                            <span class="logo-icon-ray"></span>
+                        </div>
+                        <h2 style="color: #fff; font-weight: 600; font-size: 1.75rem; margin-bottom: 0.5rem;">Welcome Back</h2>
+                        <p style="color: #888; font-size: 0.95rem;">Sign in to your Stella account</p>
+                    </div>
+                    <form id="login-form" style="margin-bottom: 1.5rem;">
+                        <div style="margin-bottom: 1.25rem;">
+                            <label style="display: block; color: #ddd; margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 500;">Email Address</label>
+                            <input type="email" id="login-email" required style="width: 100%; padding: 14px 16px; border-radius: 12px; border: 1px solid #333; background: #1a1a1a; color: #fff; font-size: 1rem; box-sizing: border-box; transition: border-color 0.2s;" placeholder="you@example.com">
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; color: #ddd; margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 500;">Password</label>
+                            <input type="password" id="login-password" required style="width: 100%; padding: 14px 16px; border-radius: 12px; border: 1px solid #333; background: #1a1a1a; color: #fff; font-size: 1rem; box-sizing: border-box; transition: border-color 0.2s;" placeholder="••••••••">
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                            <label style="display: flex; align-items: center; color: #ddd; font-size: 0.875rem; cursor: pointer;">
+                                <input type="checkbox" id="remember-me" style="margin-right: 0.5rem; cursor: pointer; width: 16px; height: 16px;">
+                                Remember me
+                            </label>
+                            <a href="#" id="forgot-password-link" style="color: #9c7ead; font-size: 0.875rem; text-decoration: none; transition: color 0.2s;">Forgot password?</a>
+                        </div>
+                        <button type="submit" style="width: 100%; padding: 14px; border-radius: 12px; border: none; background: #9c7ead; color: white; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.2s; margin-bottom: 1rem;">Sign In</button>
+                        <p id="login-error" style="color: #ff4444; text-align: center; margin: 0; font-size: 0.875rem; display: none;"></p>
+                    </form>
+                    <div style="text-align: center;">
+                        <p style="color: #888; font-size: 0.9rem;">Don't have an account? <a href="#" id="show-signup-link" style="color: #9c7ead; text-decoration: none; font-weight: 600;">Sign up</a></p>
+                    </div>
+                </div>
+
+                <!-- Signup Form -->
+                <div id="signup-form-container" style="display: none;">
+                    <div style="text-align: center; margin-bottom: 2rem;">
+                        <div class="logo-icon" style="font-size: 3rem; margin: 0 auto 1rem; display: inline-block;">
+                            <span class="logo-icon-ray"></span>
+                            <span class="logo-icon-ray"></span>
+                        </div>
+                        <h2 style="color: #fff; font-weight: 600; font-size: 1.75rem; margin-bottom: 0.5rem;">Create Account</h2>
+                        <p style="color: #888; font-size: 0.95rem;">Start managing your brand today</p>
+                    </div>
+                    <form id="signup-form" style="margin-bottom: 1.5rem;">
+                        <div style="margin-bottom: 1.25rem;">
+                            <label style="display: block; color: #ddd; margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 500;">Full Name</label>
+                            <input type="text" id="signup-name" required style="width: 100%; padding: 14px 16px; border-radius: 12px; border: 1px solid #333; background: #1a1a1a; color: #fff; font-size: 1rem; box-sizing: border-box; transition: border-color 0.2s;" placeholder="John Doe">
+                        </div>
+                        <div style="margin-bottom: 1.25rem;">
+                            <label style="display: block; color: #ddd; margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 500;">Email Address</label>
+                            <input type="email" id="signup-email" required style="width: 100%; padding: 14px 16px; border-radius: 12px; border: 1px solid #333; background: #1a1a1a; color: #fff; font-size: 1rem; box-sizing: border-box; transition: border-color 0.2s;" placeholder="you@example.com">
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; color: #ddd; margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 500;">Password</label>
+                            <input type="password" id="signup-password" required style="width: 100%; padding: 14px 16px; border-radius: 12px; border: 1px solid #333; background: #1a1a1a; color: #fff; font-size: 1rem; box-sizing: border-box; transition: border-color 0.2s;" placeholder="••••••••">
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: flex; align-items: start; color: #ddd; font-size: 0.875rem; cursor: pointer;">
+                                <input type="checkbox" id="terms-agree" required style="margin-right: 0.5rem; margin-top: 0.25rem; cursor: pointer; width: 16px; height: 16px;">
+                                <span>I agree to the <a href="#" style="color: #9c7ead; text-decoration: none;">Terms of Service</a> and <a href="#" style="color: #9c7ead; text-decoration: none;">Privacy Policy</a></span>
+                            </label>
+                        </div>
+                        <button type="submit" style="width: 100%; padding: 14px; border-radius: 12px; border: none; background: #9c7ead; color: white; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.2s; margin-bottom: 1rem;">Create Account</button>
+                        <p id="signup-error" style="color: #ff4444; text-align: center; margin: 0; font-size: 0.875rem; display: none;"></p>
+                    </form>
+                    <div style="text-align: center;">
+                        <p style="color: #888; font-size: 0.9rem;">Already have an account? <a href="#" id="show-login-link" style="color: #9c7ead; text-decoration: none; font-weight: 600;">Sign in</a></p>
+                    </div>
+                </div>
+
+                <!-- Forgot Password Form -->
+                <div id="forgot-password-container" style="display: none;">
+                    <div style="text-align: center; margin-bottom: 2rem;">
+                        <div class="logo-icon" style="font-size: 3rem; margin: 0 auto 1rem; display: inline-block;">
+                            <span class="logo-icon-ray"></span>
+                            <span class="logo-icon-ray"></span>
+                        </div>
+                        <h2 style="color: #fff; font-weight: 600; font-size: 1.75rem; margin-bottom: 0.5rem;">Reset Password</h2>
+                        <p style="color: #888; font-size: 0.95rem;">We'll send you a reset link</p>
+                    </div>
+                    <form id="forgot-password-form" style="margin-bottom: 1.5rem;">
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; color: #ddd; margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 500;">Email Address</label>
+                            <input type="email" id="forgot-email" required style="width: 100%; padding: 14px 16px; border-radius: 12px; border: 1px solid #333; background: #1a1a1a; color: #fff; font-size: 1rem; box-sizing: border-box; transition: border-color 0.2s;" placeholder="you@example.com">
+                        </div>
+                        <button type="submit" style="width: 100%; padding: 14px; border-radius: 12px; border: none; background: #9c7ead; color: white; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.2s; margin-bottom: 1rem;">Send Reset Link</button>
+                        <p id="forgot-success" style="color: #10b981; text-align: center; margin: 0; font-size: 0.875rem; display: none;"></p>
+                    </form>
+                    <div style="text-align: center;">
+                        <a href="#" id="back-to-login-link" style="color: #9c7ead; text-decoration: none; font-size: 0.9rem; font-weight: 600;">← Back to sign in</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Auth Modal Management ---
+            const authModal = document.getElementById('auth-modal');
+            const loginContainer = document.getElementById('login-form-container');
+            const signupContainer = document.getElementById('signup-form-container');
+            const forgotPasswordContainer = document.getElementById('forgot-password-container');
+            
+            const loginBtn = document.getElementById('login-btn');
+            const signupBtn = document.getElementById('signup-btn');
+            const heroSignupBtn = document.getElementById('hero-signup-btn');
+            const closeModalBtn = document.getElementById('close-auth-modal');
+            
+            const showSignupLink = document.getElementById('show-signup-link');
+            const showLoginLink = document.getElementById('show-login-link');
+            const forgotPasswordLink = document.getElementById('forgot-password-link');
+            const backToLoginLink = document.getElementById('back-to-login-link');
+            
+            // Determine auth state first
+            let isAuthed = false;
+            try {
+                const remembered = localStorage.getItem('stella_user');
+                const sessioned = sessionStorage.getItem('stella_user');
+                const storedUser = sessioned ? JSON.parse(sessioned) : (remembered ? JSON.parse(remembered) : null);
+                isAuthed = !!(storedUser && storedUser.id);
+            } catch (_) { isAuthed = false; }
+            
+            // If already authenticated, convert CTAs to Dashboard and hide duplicate
+            if (isAuthed) {
+                if (loginBtn) {
+                    // Hide the secondary header button to avoid duplicates
+                    loginBtn.style.display = 'none';
+                }
+                if (signupBtn) {
+                    signupBtn.textContent = 'Dashboard';
+                    signupBtn.onclick = (e) => { e.preventDefault(); window.location.href = '/dashboard/'; };
+                }
+                if (heroSignupBtn) {
+                    heroSignupBtn.textContent = 'Go to Dashboard';
+                    heroSignupBtn.onclick = (e) => { e.preventDefault(); window.location.href = '/dashboard/'; };
+                }
+            }
+            
+            function openModal(showForm = 'login') {
+                authModal.style.display = 'flex';
+                setTimeout(() => authModal.style.opacity = '1', 10);
+                
+                loginContainer.style.display = 'none';
+                signupContainer.style.display = 'none';
+                forgotPasswordContainer.style.display = 'none';
+                
+                if (showForm === 'login') {
+                    loginContainer.style.display = 'block';
+                } else if (showForm === 'signup') {
+                    signupContainer.style.display = 'block';
+                } else if (showForm === 'forgot') {
+                    forgotPasswordContainer.style.display = 'block';
+                }
+            }
+            
+            function closeModal() {
+                authModal.style.opacity = '0';
+                setTimeout(() => authModal.style.display = 'none', 300);
+            }
+            
+            // Open modal handlers
+            if (!isAuthed) {
+                if (loginBtn) loginBtn.addEventListener('click', () => openModal('login'));
+                if (signupBtn) signupBtn.addEventListener('click', () => openModal('signup'));
+                if (heroSignupBtn) heroSignupBtn.addEventListener('click', () => openModal('signup'));
+            }
+            if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+            
+            // All signup CTA buttons
+            const signupCTAButtons = document.querySelectorAll('.signup-cta-btn');
+            signupCTAButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openModal('signup');
+                });
+            });
+            
+            // Switch between forms
+            if (showSignupLink) showSignupLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                openModal('signup');
+            });
+            
+            if (showLoginLink) showLoginLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                openModal('login');
+            });
+            
+            if (forgotPasswordLink) forgotPasswordLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                openModal('forgot');
+            });
+            
+            if (backToLoginLink) backToLoginLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                openModal('login');
+            });
+            
+            // Close modal on overlay click
+            authModal.addEventListener('click', (e) => {
+                if (e.target === authModal) {
+                    closeModal();
+                }
+            });
+            
+            // Close modal with Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && authModal.style.display === 'flex') {
+                    closeModal();
+                }
+            });
+            
+            // Login form submission
+            const loginForm = document.getElementById('login-form');
+            if (loginForm) {
+                loginForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const email = document.getElementById('login-email').value;
+                    const password = document.getElementById('login-password').value;
+                    const rememberMe = document.getElementById('remember-me').checked;
+                    const errorEl = document.getElementById('login-error');
+                    const submitBtn = loginForm.querySelector('button[type="submit"]');
+                    
+                    // Disable button during submission
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Signing in...';
+                    errorEl.style.display = 'none';
+                    
+                    try {
+                        const response = await fetch('/api/auth.php?action=login', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                email: email,
+                                password: password,
+                                remember_me: rememberMe
+                            })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            // Store auth state
+                            sessionStorage.setItem('stella_auth', 'authenticated');
+                            sessionStorage.setItem('stella_user', JSON.stringify(data.user));
+                            sessionStorage.setItem('stella_token', data.token);
+                            
+                            if (rememberMe) {
+                                localStorage.setItem('stella_remember', 'true');
+                                localStorage.setItem('stella_user', JSON.stringify(data.user));
+                            }
+                            
+                            // Redirect to dashboard
+                            window.location.href = 'dashboard/';
+                        } else {
+                            errorEl.textContent = data.message || 'Login failed. Please try again.';
+                            errorEl.style.display = 'block';
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Sign In';
+                        }
+                    } catch (error) {
+                        console.error('Login error:', error);
+                        errorEl.textContent = 'Connection error. Please try again.';
+                        errorEl.style.display = 'block';
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Sign In';
+                    }
+                });
+            }
+            
+            // Signup form submission
+            const signupForm = document.getElementById('signup-form');
+            if (signupForm) {
+                signupForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const name = document.getElementById('signup-name').value;
+                    const email = document.getElementById('signup-email').value;
+                    const password = document.getElementById('signup-password').value;
+                    const termsAgree = document.getElementById('terms-agree').checked;
+                    const errorEl = document.getElementById('signup-error');
+                    const submitBtn = signupForm.querySelector('button[type="submit"]');
+                    
+                    if (!termsAgree) {
+                        errorEl.textContent = 'Please agree to the Terms of Service and Privacy Policy.';
+                        errorEl.style.display = 'block';
+                        return;
+                    }
+                    
+                    // Disable button during submission
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Creating account...';
+                    errorEl.style.display = 'none';
+                    
+                    try {
+                        const response = await fetch('/api/auth.php?action=register', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                full_name: name,
+                                email: email,
+                                password: password
+                            })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            // Store auth state
+                            sessionStorage.setItem('stella_auth', 'authenticated');
+                            sessionStorage.setItem('stella_user', JSON.stringify(data.user));
+                            sessionStorage.setItem('stella_token', data.token);
+                            
+                            // Redirect to dashboard
+                            window.location.href = 'dashboard/';
+                        } else {
+                            errorEl.textContent = data.message || 'Registration failed. Please try again.';
+                            errorEl.style.display = 'block';
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Create Account';
+                        }
+                    } catch (error) {
+                        console.error('Registration error:', error);
+                        errorEl.textContent = 'Connection error. Please try again.';
+                        errorEl.style.display = 'block';
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Create Account';
+                    }
+                });
+            }
+            
+            // Forgot password form submission
+            const forgotPasswordForm = document.getElementById('forgot-password-form');
+            if (forgotPasswordForm) {
+                forgotPasswordForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const email = document.getElementById('forgot-email').value;
+                    const successEl = document.getElementById('forgot-success');
+                    const submitBtn = forgotPasswordForm.querySelector('button[type="submit"]');
+                    
+                    // Disable button during submission
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Sending...';
+                    successEl.style.display = 'none';
+                    
+                    try {
+                        const response = await fetch('/api/auth.php?action=forgot-password', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                email: email
+                            })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            // Send email via EmailJS if email data is provided
+                            if (data.send_email && data.email_data) {
+                                try {
+                                    await emailjs.send(
+                                        'service_7cdagjc', // Service ID
+                                        'template_tfxibta', // Password Reset Template ID
+                                        {
+                                            to_name: data.email_data.to_name,
+                                            user_email: data.email_data.to_email,
+                                            to_email: data.email_data.to_email,
+                                            reply_to: data.email_data.to_email,
+                                            UserName: data.email_data.to_name,
+                                            ResetURL: data.email_data.reset_url
+                                        }
+                                    );
+                                    console.log('Password reset email sent successfully');
+                                } catch (emailError) {
+                                    console.error('Email sending failed:', emailError);
+                                    // Still show success to user - email failure is not critical
+                                }
+                            }
+                            
+                            successEl.textContent = data.message;
+                            successEl.style.display = 'block';
+                            
+                            setTimeout(() => {
+                                openModal('login');
+                                successEl.style.display = 'none';
+                                document.getElementById('forgot-email').value = '';
+                                submitBtn.disabled = false;
+                                submitBtn.textContent = 'Send Reset Link';
+                            }, 3000);
+                        } else {
+                            successEl.style.color = '#ff4444';
+                            successEl.textContent = data.message || 'Failed to send reset link.';
+                            successEl.style.display = 'block';
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Send Reset Link';
+                        }
+                    } catch (error) {
+                        console.error('Forgot password error:', error);
+                        successEl.style.color = '#ff4444';
+                        successEl.textContent = 'Connection error. Please try again.';
+                        successEl.style.display = 'block';
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Send Reset Link';
+                    }
+                });
+            }
+            
+            // Input focus effects
+            const inputs = document.querySelectorAll('#auth-modal input[type="email"], #auth-modal input[type="password"], #auth-modal input[type="text"]');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.style.borderColor = '#9c7ead';
+                });
+                input.addEventListener('blur', function() {
+                    this.style.borderColor = '#333';
+                });
+            });
+            
+            // Button hover effects
+            const buttons = document.querySelectorAll('#auth-modal button[type="submit"]');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.background = '#826a94';
+                    this.style.transform = 'translateY(-1px)';
+                });
+                button.addEventListener('mouseleave', function() {
+                    this.style.background = '#9c7ead';
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+            
+            // Close button hover effect
+            const closeBtn = document.getElementById('close-auth-modal');
+            if (closeBtn) {
+                closeBtn.addEventListener('mouseenter', function() {
+                    this.style.color = '#fff';
+                    this.style.background = 'rgba(255, 255, 255, 0.1)';
+                });
+                closeBtn.addEventListener('mouseleave', function() {
+                    this.style.color = '#888';
+                    this.style.background = 'none';
+                });
+            }
+            
+            // Database Configuration (for Laravel backend integration)
+            // MariaDB Database: mariadb-database-rgcs4ksokcww0g04wkwg4g4k
+            // Root Password: 0xCyopfmY90tE9YaFxMaG145rF3tsbXY4gCP1uvAr44k0iYwWEINWB34Goz5bjpL
+            // User: mariadb
+            // User Password: ba55Ko1lA8FataxMYnpl9qVploHFJXZKqCvfnwrlcxvISIqbQusX4qFeELhdYPdO
+            
+            // --- FAQ Accordion ---
+            const allFaqItems = document.querySelectorAll('.faq-item');
+            allFaqItems.forEach(item => {
+                const button = item.querySelector('button');
+                button.addEventListener('click', () => {
+                    const wasActive = item.classList.contains('active');
+                    // Close all other items
+                    allFaqItems.forEach(i => {
+                        if (i !== item) {
+                            i.classList.remove('active');
+                        }
+                    });
+                    // Toggle the clicked item
+                    if (!wasActive) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+            });
+
+            // --- Scroll Animations ---
+            const sections = document.querySelectorAll('.fade-in-section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+            sections.forEach(section => observer.observe(section));
+
+            // --- Testimonial Scroller ---
+            const scrollers = document.querySelectorAll(".scroller");
+            if (scrollers) {
+                 scrollers.forEach((scroller) => {
+                    const scrollerInner = scroller.querySelector(".scroller__inner");
+                    if (scrollerInner) {
+                         const scrollerContent = Array.from(scrollerInner.children);
+                        scrollerContent.forEach((item) => {
+                            const duplicatedItem = item.cloneNode(true);
+                            duplicatedItem.setAttribute("aria-hidden", true);
+                            scrollerInner.appendChild(duplicatedItem);
+                        });
+                    }
+                     // Set animation direction for the second scroller
+                    if(scroller.dataset.direction === 'right'){
+                        scroller.style.setProperty('--_animation-direction', 'reverse');
+                    }
+                });
+            }
+
+            // --- Hero Section & FAQ Particles ---
+            const createParticles = (container, count, className) => {
+                 if (container) {
+                    for (let i = 0; i < count; i++) {
+                        const p = document.createElement('div');
+                        p.className = className;
+                        const size = Math.random() * 2 + 1;
+                        p.style.width = `${size}px`;
+                        p.style.height = `${size}px`;
+                        p.style.left = `${Math.random() * 100}%`; // Use % for responsiveness
+                        p.style.bottom = `-${size}px`;
+                        p.style.animationDuration = `${Math.random() * 20 + 20}s`;
+                        p.style.animationDelay = `${Math.random() * 20}s`;
+                        container.appendChild(p);
+                    }
+                }
+            };
+
+            // Create particles for Hero
+            createParticles(document.querySelector('.particle-wrapper'), 30, 'particle');
+            
+            // Create particles for each FAQ item
+            document.querySelectorAll('.faq-item .particle-container').forEach(container => {
+                createParticles(container, 15, 'particle');
+            });
+            
+            // Create particles for each pricing card
+            document.querySelectorAll('.pricing-card .particle-container').forEach(container => {
+                createParticles(container, 20, 'particle');
+            });
+
+
+            const night = document.querySelector('.night');
+             if (night) {
+                const createStar = () => {
+                    if (night.childElementCount >= 3) return;
+                    const star = document.createElement('div');
+                    star.className = 'shooting_star';
+                    const roll = Math.random();
+                    const scale = roll > 0.97 ? 3.5 : (roll > 0.9 ? 2.25 : 1);
+                    star.style.setProperty('--star-height', `${2 * scale}px`);
+                    star.style.setProperty('--star-tail-length', `${150 * scale}px`);
+                    star.style.setProperty('--star-head-size', `${30 * scale}px`);
+                    const dur = (Math.random() * 2 + 3).toFixed(2);
+                    star.style.animationDuration = `${dur}s, ${dur}s`;
+                    star.style.animationDelay = `${(Math.random() * 2).toFixed(2)}s, ${(Math.random() * 2).toFixed(2)}s`;
+                    const angle = Math.floor(Math.random() * 2) === 0 ? -30 + Math.random() * 60 : 150 + Math.random() * 60;
+                    star.style.setProperty('--star-rotation', `${angle}deg`);
+                    star.style.top = `${Math.random() * (window.innerHeight * 0.8)}px`;
+                    star.style.left = angle < 90 ? '-20px' : `${window.innerWidth + 20}px`;
+                    star.addEventListener('animationend', () => star.remove());
+                    night.appendChild(star);
+                };
+                setInterval(createStar, 2500);
+            }
+
+            // --- Dynamic Header Script ---
+            const header = document.querySelector('header');
+            if(header){
+                const handleScroll = () => header.classList.toggle('header-scrolled', window.scrollY > 10);
+                window.addEventListener('scroll', handleScroll, { passive: true });
+                handleScroll();
+            }
+            
+        });
+
+        // --- Billing Integration ---
+        function redirectToSignup(plan) {
+            if (plan === 'pro') {
+                // Redirect to dashboard billing page for Pro upgrade
+                window.location.href = '/dashboard/?page=billing';
+            } else {
+                // Redirect to signup for free trial
+                window.location.href = '/dashboard/';
+            }
+        }
+    </script>
+</body>
+</html>

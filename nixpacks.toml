@@ -1,0 +1,15 @@
+[phases.setup]
+nixPkgs = ['php82', 'php82Packages.composer', 'nginx']
+nixOverlays = ['https://github.com/railwayapp/nix-npm-overlay/archive/main.tar.gz']
+nixpkgsArchive = 'e05605ec414618eab4a7a6aea8b38f6fbbcc8f08'
+
+[phases.install]
+cmds = [
+    'mkdir -p /var/log/nginx && mkdir -p /var/cache/nginx',
+    'composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist',
+    'composer dump-autoload --optimize'
+]
+
+[start]
+cmd = 'php -S 0.0.0.0:$PORT -t .'
+
