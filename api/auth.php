@@ -176,7 +176,7 @@ function handleLogin($pdo, $data) {
         
         // Find user with plan information
         $stmt = $pdo->prepare("
-            SELECT id, full_name, email, password, 
+            SELECT id, full_name, email, password, workspace_owner_id,
                    plan_type, stripe_customer_id, stripe_subscription_id, subscription_status
             FROM users 
             WHERE email = ?
@@ -186,6 +186,15 @@ function handleLogin($pdo, $data) {
         
         if (!$user || !password_verify($password, $user['password'])) {
             sendJson(['success' => false, 'message' => 'Invalid credentials'], 401);
+        }
+        
+        // Check if user is a team member and get owner's plan
+        $ownerPlan = null;
+        if ($user['workspace_owner_id']) {
+            $ownerStmt = $pdo->prepare("SELECT plan_type FROM users WHERE id = ?");
+            $ownerStmt->execute([$user['workspace_owner_id']]);
+            $owner = $ownerStmt->fetch();
+            $ownerPlan = $owner['plan_type'] ?? null;
         }
         
         // Start PHP session and store user data
@@ -208,6 +217,8 @@ function handleLogin($pdo, $data) {
                 'id' => (int)$user['id'],
                 'full_name' => $user['full_name'],
                 'email' => $user['email'],
+                'workspace_owner_id' => $user['workspace_owner_id'] ? (int)$user['workspace_owner_id'] : null,
+                'owner_plan' => $ownerPlan,
                 'plan_type' => $user['plan_type'] ?? 'free',
                 'subscription_status' => $user['subscription_status'] ?? 'inactive'
             ],

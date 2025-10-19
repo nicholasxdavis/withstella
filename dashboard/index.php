@@ -18,7 +18,7 @@
         window.STRIPE_CONFIG_LOADED = false;
         
         // Fetch config on page load
-        (async function loadConfig() {
+        (async function loadConfig() { 
             try {
                 const response = await fetch('/api/config.php');
                 const data = await response.json();
@@ -2247,6 +2247,9 @@
                 
                 // Update navigation permissions based on user role
                 updateNavigationPermissions();
+                
+                // Update Pro badge visibility based on effective Pro access
+                updateProBadgeVisibility();
 
                 // Load assets from database API (syncs across devices)
                 try {
@@ -2413,12 +2416,16 @@
                                 <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold">Usage Snapshot</h2><a href="https://www.stellabusiness.com/pricing" target="_blank" rel="noopener noreferrer" class="glow-btn btn-secondary px-3 py-1 rounded-full text-sm no-underline" id="pricing-button" style="display: none;">Pricing</a></div>
                                 <div class="space-y-5">
                                     <div>
-                                        <div class="flex justify-between items-baseline mb-1"><p class="font-medium text-sm">Kits</p><p class="text-lg font-bold" id="usage-kits-count">0 <span class="text-sm font-normal text-[var(--text-secondary)]">/ 10</span></p></div>
+                                        <div class="flex justify-between items-baseline mb-1"><p class="font-medium text-sm">Brand Kits</p><p class="text-lg font-bold" id="usage-kits-count">0 <span class="text-sm font-normal text-[var(--text-secondary)]">/ 1</span></p></div>
                                         <div class="progress-bar"><div id="usage-kits-progress" class="progress-bar-fill" style="width: 0%;"></div></div>
                                     </div>
                                     <div>
-                                        <div class="flex justify-between items-baseline mb-1"><p class="font-medium text-sm">Assets Uploaded</p><p class="text-lg font-bold" id="usage-assets-count">0</p></div>
-                                        <div class="progress-bar"><div id="usage-assets-progress" class="progress-bar-fill" style="width: 0%;"></div></div>
+                                        <div class="flex justify-between items-baseline mb-1"><p class="font-medium text-sm">Team Members</p><p class="text-lg font-bold" id="usage-members-count">1 <span class="text-sm font-normal text-[var(--text-secondary)]">/ 2</span></p></div>
+                                        <div class="progress-bar"><div id="usage-members-progress" class="progress-bar-fill" style="width: 50%;"></div></div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between items-baseline mb-1"><p class="font-medium text-sm">Storage</p><p class="text-lg font-bold" id="usage-storage-count">0 MB <span class="text-sm font-normal text-[var(--text-secondary)]">/ 1 GB</span></p></div>
+                                        <div class="progress-bar"><div id="usage-storage-progress" class="progress-bar-fill" style="width: 0%;"></div></div>
                                     </div>
                                 </div>
                             </div>
@@ -3008,7 +3015,7 @@
                             <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-[var(--border-dark)]">
                                 <div>
                                     <h3 class="text-lg font-semibold" id="current-plan-name">Free Trial</h3>
-                                    <p class="text-sm text-[var(--text-secondary)]" id="current-plan-description">5 kits, 2 users, 5GB storage</p>
+                                    <p class="text-sm text-[var(--text-secondary)]" id="current-plan-description">1 kit, 2 users, 1GB storage</p>
                                 </div>
                                 <div class="text-right">
                                     <p class="text-2xl font-bold" id="current-plan-price">$0</p>
@@ -3028,7 +3035,7 @@
                                     <div class="progress-bar">
                                         <div id="storage-progress" class="progress-bar-fill" style="width: 0%; background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);"></div>
                                     </div>
-                                    <p class="text-xs text-[var(--text-secondary)] mt-1" id="storage-limit">of 5 GB used</p>
+                                    <p class="text-xs text-[var(--text-secondary)] mt-1" id="storage-limit">of 1 GB used</p>
                                 </div>
                                 <div>
                                     <div class="flex justify-between mb-2">
@@ -3038,7 +3045,7 @@
                                     <div class="progress-bar">
                                         <div id="kits-progress" class="progress-bar-fill" style="width: 0%; background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);"></div>
                                     </div>
-                                    <p class="text-xs text-[var(--text-secondary)] mt-1" id="kits-limit">of 5 kits used</p>
+                                    <p class="text-xs text-[var(--text-secondary)] mt-1" id="kits-limit">of 1 kit used</p>
                                 </div>
                                 <div>
                                     <div class="flex justify-between mb-2">
@@ -3068,7 +3075,7 @@
                                 <ul class="space-y-3 mb-6">
                                     <li class="flex items-center">
                                         <i class="fas fa-check text-green-400 mr-3"></i>
-                                        <span class="text-sm">5 Brand Kits</span>
+                                        <span class="text-sm">1 Brand Kit</span>
                                     </li>
                                     <li class="flex items-center">
                                         <i class="fas fa-check text-green-400 mr-3"></i>
@@ -3076,11 +3083,11 @@
                                     </li>
                                     <li class="flex items-center">
                                         <i class="fas fa-check text-green-400 mr-3"></i>
-                                        <span class="text-sm">5GB Storage</span>
+                                        <span class="text-sm">1GB Storage</span>
                                     </li>
                                     <li class="flex items-center">
                                         <i class="fas fa-check text-green-400 mr-3"></i>
-                                        <span class="text-sm">Basic Support</span>
+                                        <span class="text-sm">Standard Support</span>
                                     </li>
                                 </ul>
                                 <button id="current-plan-btn" class="w-full py-2 px-4 rounded-lg border border-[var(--border-dark)] text-[var(--text-secondary)] cursor-not-allowed" disabled>
@@ -3105,11 +3112,11 @@
                                     </li>
                                     <li class="flex items-center">
                                         <i class="fas fa-check text-green-400 mr-3"></i>
-                                        <span class="text-sm">10 Team Members</span>
+                                        <span class="text-sm">Unlimited Team Members</span>
                                     </li>
                                     <li class="flex items-center">
                                         <i class="fas fa-check text-green-400 mr-3"></i>
-                                        <span class="text-sm">10GB Storage</span>
+                                        <span class="text-sm">Unlimited Storage</span>
                                     </li>
                                     <li class="flex items-center">
                                         <i class="fas fa-check text-green-400 mr-3"></i>
@@ -3166,6 +3173,40 @@
             }
 
             // --- UI MODULES ---
+            
+            // Check if user has effective Pro access (own plan or inherited from Pro owner)
+            function hasEffectiveProAccess() {
+                const currentUser = JSON.parse(sessionStorage.getItem('stella_user') || '{}');
+                const userPlan = currentUser.plan_type || 'free';
+                
+                // If user is Pro, they have access
+                if (userPlan === 'pro') {
+                    return true;
+                }
+                
+                // Check if user is a team member (has workspace_owner_id)
+                // Team members inherit Pro benefits from their owner
+                if (currentUser.workspace_owner_id && currentUser.owner_plan === 'pro') {
+                    return true;
+                }
+                
+                return false;
+            }
+            
+            // Update Pro badge visibility based on effective Pro access
+            function updateProBadgeVisibility() {
+                const hasPro = hasEffectiveProAccess();
+                const proBadges = document.querySelectorAll('.pro-badge');
+                
+                // Hide PRO badges if user has Pro access (own or inherited)
+                proBadges.forEach(badge => {
+                    if (hasPro) {
+                        badge.style.display = 'none';
+                    } else {
+                        badge.style.display = '';
+                    }
+                });
+            }
 
             function setupNavigation() {
                 const navItems = document.querySelectorAll('.nav-item');
@@ -3177,16 +3218,11 @@
                         const pageId = item.getAttribute('data-page');
                         const requiresPro = item.getAttribute('data-requires-pro') === 'true';
                         
-                        // Check if page requires Pro and user is on free plan
-                        if (requiresPro) {
-                            const currentUser = JSON.parse(sessionStorage.getItem('stella_user') || '{}');
-                            const userPlan = currentUser.plan_type || 'free';
-                            
-                            if (userPlan !== 'pro') {
-                                // Show upgrade prompt instead of navigating
-                                showProUpgradePrompt(item.querySelector('span')?.textContent || 'this feature');
-                                return;
-                            }
+                        // Check if page requires Pro and user doesn't have access
+                        if (requiresPro && !hasEffectiveProAccess()) {
+                            // Show upgrade prompt instead of navigating
+                            showProUpgradePrompt(item.querySelector('span')?.textContent || 'this feature');
+                            return;
                         }
                         
                         // Update nav active state for all navs (desktop and mobile)
@@ -6830,18 +6866,44 @@
             }
 
             function updateDashboardStats() {
+                const currentUser = JSON.parse(sessionStorage.getItem('stella_user') || '{}');
+                const userPlan = currentUser.plan_type || 'free';
+                
                 // Kits
                 const kitsCount = brandKits.length;
-                const kitsProgress = Math.min((kitsCount / 10) * 100, 100);
-                document.getElementById('usage-kits-count').innerHTML = `${kitsCount} <span class="text-sm font-normal text-[var(--text-secondary)]">/ 10</span>`;
+                const kitsLimit = userPlan === 'pro' ? '∞' : 1;
+                const kitsProgress = userPlan === 'pro' ? 0 : Math.min((kitsCount / 1) * 100, 100);
+                document.getElementById('usage-kits-count').innerHTML = `${kitsCount} <span class="text-sm font-normal text-[var(--text-secondary)]">/ ${kitsLimit}</span>`;
                 document.getElementById('usage-kits-progress').style.width = `${kitsProgress}%`;
 
-                // Assets (excluding logos)
-                const regularAssets = assets.filter(asset => asset.type !== 'logo');
-                const assetsCount = regularAssets.length;
-                const assetsProgress = Math.min((assetsCount / 2000) * 100, 100); // Assuming a 2000 asset limit
-                document.getElementById('usage-assets-count').textContent = assetsCount.toLocaleString();
-                document.getElementById('usage-assets-progress').style.width = `${assetsProgress}%`;
+                // Team Members
+                const membersCount = teamMembers.length + 1; // +1 for current user
+                const membersLimit = userPlan === 'pro' ? '∞' : 2;
+                const membersProgress = userPlan === 'pro' ? 0 : Math.min((membersCount / 2) * 100, 100);
+                const membersEl = document.getElementById('usage-members-count');
+                if (membersEl) {
+                    membersEl.innerHTML = `${membersCount} <span class="text-sm font-normal text-[var(--text-secondary)]">/ ${membersLimit}</span>`;
+                }
+                const membersProgressEl = document.getElementById('usage-members-progress');
+                if (membersProgressEl) {
+                    membersProgressEl.style.width = `${membersProgress}%`;
+                }
+                
+                // Storage - calculate actual usage from assets
+                const totalBytes = assets.reduce((sum, asset) => sum + (parseInt(asset.size) || 0), 0);
+                const totalMB = (totalBytes / (1024 * 1024)).toFixed(0);
+                const totalGB = (totalBytes / (1024 * 1024 * 1024)).toFixed(2);
+                const storageLimit = userPlan === 'pro' ? '∞' : '1 GB';
+                const storageProgress = userPlan === 'pro' ? 0 : Math.min((totalBytes / (1024 * 1024 * 1024)) * 100, 100);
+                const storageEl = document.getElementById('usage-storage-count');
+                if (storageEl) {
+                    const display = totalGB >= 1 ? `${totalGB} GB` : `${totalMB} MB`;
+                    storageEl.innerHTML = `${display} <span class="text-sm font-normal text-[var(--text-secondary)]">/ ${storageLimit}</span>`;
+                }
+                const storageProgressEl = document.getElementById('usage-storage-progress');
+                if (storageProgressEl) {
+                    storageProgressEl.style.width = `${storageProgress}%`;
+                }
             }
             
             function renderTeamOverview() {
@@ -6851,7 +6913,14 @@
 
                 if(!countEl || !listEl || !currentUser) return;
                 
-                const totalMembers = teamMembers.length + 1 + pendingInvites.length;
+                // Filter out current user from teamMembers to avoid duplicates
+                const filteredTeamMembers = teamMembers.filter(member => 
+                    member.email !== currentUser.email && 
+                    member.id !== currentUser.id &&
+                    member.member_email !== currentUser.email
+                );
+                
+                const totalMembers = filteredTeamMembers.length + 1 + pendingInvites.length;
                 countEl.textContent = totalMembers;
                 
                 listEl.innerHTML = '';
@@ -6863,7 +6932,7 @@
                     </div>`;
 
                 // Show first 2 members or pending invites combined
-                const combined = [...teamMembers, ...pendingInvites.map(inv => ({ name: inv.email, email: inv.email, role: 'Pending' }))];
+                const combined = [...filteredTeamMembers, ...pendingInvites.map(inv => ({ name: inv.email, email: inv.email, role: 'Pending' }))];
                 combined.slice(0, 2).forEach(member => {
                     const initial = member.name ? member.name.charAt(0).toUpperCase() : member.email.charAt(0).toUpperCase();
                     const isPending = member.role === 'Pending';
@@ -7110,7 +7179,7 @@
                 
                 if (!modal || !title || !body || !btnContainer) return;
                 
-                title.innerHTML = '<i class="fas fa-crown text-yellow-400 mr-2"></i>Upgrade to Pro';
+                title.innerHTML = 'Upgrade to Pro';
                 body.innerHTML = `
                     <div class="text-center py-4">
                         <div class="text-6xl mb-4" style="color: #9c7ead;">
@@ -7145,12 +7214,14 @@
                 `;
                 
                 btnContainer.innerHTML = `
-                    <button class="btn btn-primary px-6 py-3 rounded-full font-semibold transition-all" style="background-color: #9c7ead; border-color: #9c7ead;" onmouseover="this.style.backgroundColor='#8b6c9c'" onmouseout="this.style.backgroundColor='#9c7ead'" onclick="document.getElementById('confirmation-modal').classList.remove('active'); document.querySelectorAll('.nav-item[data-page=\\'billing\\']')[0].click();">
-                        <i class="fas fa-rocket mr-2"></i>Upgrade to Pro
-                    </button>
-                    <button class="btn btn-secondary px-6 py-3 rounded-full font-semibold" onclick="document.getElementById('confirmation-modal').classList.remove('active');">
-                        Maybe Later
-                    </button>
+                    <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+                        <button class="btn btn-primary px-6 py-3 rounded-full font-semibold transition-all" style="background-color: #9c7ead; border-color: #9c7ead;" onmouseover="this.style.backgroundColor='#8b6c9c'" onmouseout="this.style.backgroundColor='#9c7ead'" onclick="document.getElementById('confirmation-modal').classList.remove('active'); document.querySelectorAll('.nav-item[data-page=\\'billing\\']')[0].click();">
+                            <i class="fas fa-rocket mr-2"></i>Upgrade to Pro
+                        </button>
+                        <button class="btn btn-secondary px-6 py-3 rounded-full font-semibold" onclick="document.getElementById('confirmation-modal').classList.remove('active');">
+                            Maybe Later
+                        </button>
+                    </div>
                 `;
                 
                 if (defaultOkBtn) {
@@ -7439,48 +7510,59 @@
 
         // Update current plan display
         function updateCurrentPlanDisplay() {
-            const plan = PLAN_LIMITS[currentUserPlan];
-            document.getElementById('current-plan-name').textContent = plan.name;
-            document.getElementById('current-plan-description').textContent = plan.description;
-            document.getElementById('current-plan-price').textContent = `$${plan.price}`;
+            const currentUser = JSON.parse(sessionStorage.getItem('stella_user') || '{}');
+            const userPlan = currentUser.plan_type || 'free';
+            
+            if (userPlan === 'pro') {
+                document.getElementById('current-plan-name').textContent = 'Pro';
+                document.getElementById('current-plan-description').textContent = 'Unlimited kits, users, storage';
+                document.getElementById('current-plan-price').textContent = '$15';
+            } else {
+                document.getElementById('current-plan-name').textContent = 'Free Trial';
+                document.getElementById('current-plan-description').textContent = '1 kit, 2 users, 1GB storage';
+                document.getElementById('current-plan-price').textContent = '$0';
+            }
         }
 
         // Update usage display
         function updateUsageDisplay() {
-            const plan = PLAN_LIMITS[currentUserPlan];
+            const currentUser = JSON.parse(sessionStorage.getItem('stella_user') || '{}');
+            const userPlan = currentUser.plan_type || 'free';
+            
+            // Calculate actual usage
+            const kitsUsed = brandKits.length;
+            const usersUsed = teamMembers.length + 1; // +1 for current user
+            const totalBytes = assets.reduce((sum, asset) => sum + (parseInt(asset.size) || 0), 0);
+            const storageUsed = (totalBytes / (1024 * 1024 * 1024)).toFixed(2);
+            
+            // Set limits based on plan
+            const storageLimit = userPlan === 'pro' ? '∞' : 1;
+            const kitsLimit = userPlan === 'pro' ? '∞' : 1;
+            const usersLimit = userPlan === 'pro' ? '∞' : 2;
             
             // Update storage usage
-            const storageUsed = currentUsage.storage.toFixed(1);
-            const storageLimit = plan.limits.storage;
-            const storagePercent = Math.min((currentUsage.storage / storageLimit) * 100, 100);
-            
+            const storagePercent = userPlan === 'pro' ? 0 : Math.min((parseFloat(storageUsed) / 1) * 100, 100);
             document.getElementById('storage-used').textContent = `${storageUsed} GB`;
             document.getElementById('storage-progress').style.width = `${storagePercent}%`;
-            document.getElementById('storage-limit').textContent = `of ${storageLimit} GB used`;
+            document.getElementById('storage-limit').textContent = userPlan === 'pro' ? 'unlimited' : `of 1 GB used`;
             
             // Update kits usage
-            const kitsUsed = currentUsage.kits;
-            const kitsLimit = plan.limits.kits;
-            const kitsPercent = kitsLimit === -1 ? 0 : Math.min((kitsUsed / kitsLimit) * 100, 100);
-            
+            const kitsPercent = userPlan === 'pro' ? 0 : Math.min((kitsUsed / 1) * 100, 100);
             document.getElementById('kits-used').textContent = kitsUsed.toString();
             document.getElementById('kits-progress').style.width = `${kitsPercent}%`;
-            document.getElementById('kits-limit').textContent = kitsLimit === -1 ? 'unlimited' : `of ${kitsLimit} kits used`;
+            document.getElementById('kits-limit').textContent = userPlan === 'pro' ? 'unlimited' : `of 1 kit used`;
             
             // Update users usage
-            const usersUsed = currentUsage.users;
-            const usersLimit = plan.limits.users;
-            const usersPercent = Math.min((usersUsed / usersLimit) * 100, 100);
-            
+            const usersPercent = userPlan === 'pro' ? 0 : Math.min((usersUsed / 2) * 100, 100);
             document.getElementById('users-used').textContent = usersUsed.toString();
             document.getElementById('users-progress').style.width = `${usersPercent}%`;
-            document.getElementById('users-limit').textContent = `of ${usersLimit} users used`;
+            document.getElementById('users-limit').textContent = userPlan === 'pro' ? 'unlimited' : `of 2 users used`;
             
             // Update plan buttons
             const currentPlanBtn = document.getElementById('current-plan-btn');
             const upgradeBtn = document.getElementById('upgrade-to-pro-btn');
             
-            if (currentUserPlan === 'free') {
+            if (userPlan === 'free') {
                 currentPlanBtn.textContent = 'Current Plan';
                 currentPlanBtn.disabled = true;
                 upgradeBtn.textContent = 'Upgrade to Pro';
